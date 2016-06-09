@@ -20,6 +20,7 @@ import Viewer.TableViewer;
 public class UserInterface {
 	Pagination page;
 	ArrayList<Product> currentData;
+	ProductDAO proDao;
 /*------------------constructor------------------------*/
 	
 	public UserInterface(){
@@ -28,7 +29,8 @@ public class UserInterface {
 		long et=System.currentTimeMillis();
 		System.out.println((et-st)/1000+" seconds");
 		System.out.println("Checking recovery...!");
-		page=new Pagination(ProductDAO.numberOfProduct());
+		proDao=new ProductDAO();
+		page=new Pagination(proDao.numberOfProduct());
 		Menu();
 			
 	}
@@ -37,7 +39,7 @@ public class UserInterface {
 	public void Menu(){
 		
 		String choice;
-		OperationsControl.displayProduct(prdRecords, page);
+		//display data here
 		do{
 			System.out.println();
 			System.out.printf("%80s","+===================================================================================+\n");
@@ -48,7 +50,7 @@ public class UserInterface {
 			System.out.println();
 			//System.out.print("Option >");
 			//choice="";
-			choice=OperationsControl.inputString("Option >");	//cin.nextLine();
+			choice=Input.inputString("Option >");	//cin.nextLine();
 			if(choice.contains("#")){
 				UI_Function.shortcut(choice,this);
 				continue;

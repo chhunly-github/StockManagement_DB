@@ -1,12 +1,14 @@
 package DAO;
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 import Product.Product;
 
@@ -21,20 +23,22 @@ public class ProductDAO {
 		return result;
 	}
 	
-	public ArrayList<Product> getAllStudents(){
-		ArrayList<Product> students=new ArrayList<>();
+	public ArrayList<Product> getAllProducts(){
+		ArrayList<Product> products=new ArrayList<>();
 		Connection cnn = null;
 		try {
-			cnn=DbConnection.getConnection("dbstudent");
-			String sql="SELECT * FROM tbstudent ORDER BY id";
+			cnn=DbConnection.getConnection("dbProduct");
+			String sql="SELECT * FROM tbproduct ORDER BY id";
 			Statement st=cnn.createStatement();
 			ResultSet rs=st.executeQuery(sql);
 			while(rs.next()){
 				int id=rs.getInt("id");
 				String name=rs.getString("name");
-				String sex=rs.getString("sex");
-				Date dob=(Date) rs.getObject("date_of_birth");
-				students.add(new Product(id, name, sex, dob, null));
+				Float unitprice=rs.getFloat("unitprice");
+				Float quantity=rs.getFloat("quantity");
+				String impdate=rs.getString("impdate");
+				String content=rs.getString("content");
+				products.add(new Product(id, name, unitprice, quantity, impdate, content));
 			}
 			
 		} catch (ClassNotFoundException | SQLException e) {
@@ -48,70 +52,77 @@ public class ProductDAO {
 					e.printStackTrace();
 				}
 		}
-		return students;	
+		return products;	
 	}
-	public static ArrayList<Student> searchStudentById(int id){
-		ArrayList<Student> students=new ArrayList<>();
+	public ArrayList<Product> searchProductById(int id){
+		ArrayList<Product> products=new ArrayList<>();
 		try {
 			Connection cnn=DbConnection.getConnection("dbStudent");
-			String sql="SELECT * FROM tbstudent WHERE id=?";
+			String sql="SELECT * FROM tbproduct WHERE id=?";
 			PreparedStatement st=cnn.prepareStatement(sql);
 			st.setInt(1, id);
 			ResultSet rs=st.executeQuery();
 			while(rs.next()){
+				//int id=rs.getInt("id");
 				String name=rs.getString("name");
-				String sex=rs.getString("sex");
-				Date dob=(Date) rs.getObject("date_of_birth");
-				students.add(new Student(id, name,sex, dob, null));
+				Float unitprice=rs.getFloat("unitprice");
+				Float quantity=rs.getFloat("quantity");
+				String impdate=rs.getString("impdate");
+				String content=rs.getString("content");
+				products.add(new Product(id, name, unitprice, quantity, impdate, content));
 			}
 			
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
 		}
-		return students;
+		return products;
 	}
-	public static ArrayList<Student> searchStudentByName(String name){
-		ArrayList<Student> students=new ArrayList<>();
+	public ArrayList<Product> searchProductByName(String sname){
+		ArrayList<Product> products=new ArrayList<>();
 		try {
-			Connection cnn=DbConnection.getConnection("dbStudent");
-			String sql="SELECT * FROM tbstudent WHERE name like ? ORDER BY id";
+			Connection cnn=DbConnection.getConnection("dbProduct");
+			String sql="SELECT * FROM tbproduct WHERE name like ? ORDER BY id";
 			PreparedStatement st=cnn.prepareStatement(sql);
-			st.setString(1, "%"+name+"%");
+			st.setString(1, "%"+sname+"%");
 			ResultSet rs=st.executeQuery();
 			while(rs.next()){
 				int id=rs.getInt("id");
-				String rname=rs.getString("name");
-				String sex=rs.getString("sex");
-				Date dob=(Date) rs.getObject("date_of_birth");
-				students.add(new Student(id, rname,sex, dob, null));
+				String name=rs.getString("name");
+				Float unitprice=rs.getFloat("unitprice");
+				Float quantity=rs.getFloat("quantity");
+				String impdate=rs.getString("impdate");
+				String content=rs.getString("content");
+				products.add(new Product(id, name, unitprice, quantity, impdate, content));
 			}
 			
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
 		}
-		return students;
+		return products;
 	}
-	public static ArrayList<Product> searchStudentByRandom(String search){
-		ArrayList<Product> sts=new ProductDAO().getAllStudents();
-		ArrayList<Product> students=new ArrayList<>();
-		for(Product prd:sts){
+	public ArrayList<Product> searchProductByRandom(String search){
+		ArrayList<Product> prds=new ProductDAO().getAllProducts();
+		ArrayList<Product> products=new ArrayList<>();
+		for(Product prd:prds){
 			if((prd.toString().replace('/', ' ')).toUpperCase().contains(search.toUpperCase())){
-				students.add(prd);
+				products.add(prd);
 			}
 			//System.out.println(st.toString().replace('/', ' '));
 		}
-		return students;
+		return products;
 	}
 	
-	public static boolean insertData(Product prd){
+	public boolean insertData(Product prd){
 		try {
-			Connection cnn=DbConnection.getConnection("dbStudent");
-			String sql="INSERT INTO tbstudent VALUES(?,?,?,?)";
+			Connection cnn=DbConnection.getConnection("dbProduct");
+			String sql="INSERT INTO tbproduct VALUES(?,?,?,?,?)";
 			PreparedStatement pps=cnn.prepareStatement(sql);
-			pps.setInt(1, st.getId());
-			pps.setString(2, st.getName());
-			pps.setString(3, st.getSex());
-			pps.setDate(4, st.getDob());
+			pps.setInt(1, prd.getId());
+			pps.setString(2, prd.getName());
+			pps.setFloat(3, prd.getUnitPrice());
+			pps.setFloat(4, prd.getStockQty());
+			pps.setString(5, prd.getImpDate());
+			pps.setString(6, prd.getContent());
 			
 			pps.executeUpdate();
 			return true;
@@ -123,17 +134,20 @@ public class ProductDAO {
 		}
 		return false;
 	}
-	public static boolean updateData(Product prd){
+	public boolean updateData(Product prd){
 		try {
-			Connection cnn=DbConnection.getConnection("dbStudent");
-			String sql="UPDATE tbstudent SET name=?,sex=?,date_of_birth=? WHERE id=?;";
+			Connection cnn=DbConnection.getConnection("dbProduct");
+			String sql="UPDATE tbproduct SET name=?,unitprice=?,quantity=?,content=? WHERE id=?;";
 			PreparedStatement pps=cnn.prepareStatement(sql);
 			
-			pps.setString(1, st.getName());
-			pps.setString(2, st.getSex());
-			pps.setDate(3, st.getDob());
-			pps.setInt(4, st.getId());
+			pps.setString(1, prd.getName());
+			pps.setFloat(2, prd.getUnitPrice());
+			pps.setFloat(3, prd.getStockQty());
+			pps.setString(4, prd.getContent());
+			pps.setInt(5, prd.getId());
+			
 			pps.executeUpdate();
+			
 			return true;
 			
 		} catch (ClassNotFoundException e) {
@@ -143,10 +157,12 @@ public class ProductDAO {
 		}
 		return false;
 	}
-	public static boolean deleteDataById(int id){
+	
+	/*--------------------------------------delete data-------------------------------*/
+	public boolean deleteDataById(int id){
 		try {
-			Connection cnn=DbConnection.getConnection("dbStudent");
-			String sql="DELETE FROM tbProduct WHERE id=?";
+			Connection cnn=DbConnection.getConnection("dbProduct");
+			String sql="DELETE FROM tbproduct WHERE id=?";
 			PreparedStatement pps=cnn.prepareStatement(sql);
 			pps.setInt(1, id);
 			pps.executeUpdate();
@@ -160,10 +176,10 @@ public class ProductDAO {
 		return false;
 	}
 	
-	public static boolean deleteDataByName(String name){
+	public boolean deleteDataByName(String name){
 		try {
 			Connection cnn=DbConnection.getConnection("dbProduct");
-			String sql="DELETE FROM tbProduct WHERE name=?";
+			String sql="DELETE FROM tbproduct WHERE name=?";
 			PreparedStatement pps=cnn.prepareStatement(sql);
 			pps.setString(1, name);
 			pps.executeUpdate();
@@ -176,10 +192,10 @@ public class ProductDAO {
 		}
 		return false;
 	}
-	public static boolean deleteAll(){
+	public boolean deleteAll(){
 		try {
 			Connection cnn=DbConnection.getConnection("dbProduct");
-			String sql="DELETE FROM tbstudent";
+			String sql="DELETE FROM tbproduct";
 			PreparedStatement pps=cnn.prepareStatement(sql);
 			pps.executeUpdate();
 			cnn.close();
@@ -192,10 +208,11 @@ public class ProductDAO {
 		}
 		return false;
 	}
-	public static int numberOfProduct(){
+	/*------------------------------------get all amount of product-------------------*/
+	public int numberOfProduct(){
 		try{
 			Connection cnn=DbConnection.getConnection("dbProduct");
-			String getCount="SELECT COUNT FROM tbProduct";
+			String getCount="SELECT COUNT FROM tbproduct";
 			Statement stm=cnn.createStatement();
 			int count=stm.executeQuery(getCount).getRow();
 			return count;

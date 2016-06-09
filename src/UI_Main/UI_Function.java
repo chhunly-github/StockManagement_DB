@@ -2,14 +2,18 @@ package UI_Main;
 
 import java.io.File;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Scanner;
 
 import org.omg.PortableInterceptor.USER_EXCEPTION;
 
 import Controller.Input;
+import DAO.ProductDAO;
 import DAO.StudentDAO;
+import DTO_Model.Student;
 import Operations.OperationsControl;
 import Pagination.Pagination;
 import Product.Product;
@@ -20,73 +24,211 @@ public class UI_Function {
 	private UI_Function(){
 		
 	}
-	public static void display(UserInterface src){
+	public static void display(UserInterface ui){
 		System.out.println("Display Data");
-		UserInterface.prdRecords=UserInterface.defaultRecords;
-		src.currentPage.calculate(UserInterface.prdRecords.size());
-		OperationsControl.displayProduct(UserInterface.prdRecords, src.currentPage);
+		ui.page.calculate(ui.currentData.size());
+		Viewer.displayProduct(ui.currentData, ui.page);
 	}
 	
 	//----------------------------------write new product----------------------//
-	public static void write(UserInterface src){
+	public static void write(UserInterface ui){
 		System.out.println("Write Data");
-		OperationsControl.insertData();
-		src.defaultRecords=src.prdRecords;
+		
+		System.out.println("--------------------------**************************-----------------------");
+		System.out.println("-------------------------------Add new product-------------------------");
+		int id=(int)Input.inputFloat("Input id:");
+		String name=Input.inputString("Input name:");
+		float unit=Input.inputFloat("Unit Price");
+		float qty=Input.inputFloat("Stock quantity:");
+		System.out.print("Content: ");
+		String content=Input.inputContent();
+		//Date date=Input.inputDate("Input date:");
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy/MM/dd");
+		String date=sdf.format(new Date());
+		//System.out.println(sdf.format(new java.util.Date()));
+		if(!ui.proDao.insertData(new Product(id,name,unit,qty,date,content))){
+			System.out.println("Failed to insert data, data may duplicate primary key.");
+			return;
+		}
+		System.out.println("Insertion succeed");
+		
 	}
 	
 	//------------------------------view specific product------------------//
-	public static void read(UserInterface src){
+	public static void read(UserInterface ui){
 		System.out.println("Read Data");
-		if(src.prdRecords.isEmpty()){
-			System.out.println("There is no product here!");
+		if(ui.proDao.numberOfProduct()==0){
+			System.out.println("There's no product to view.");
 			return;
 		}
 		int rId=(int)Input.inputFloat("Product id ");
-		OperationsControl.viewProduct(src.prdRecords, rId);
+		ArrayList<Product> prds=ui.proDao.searchProductById(rId);
+		if(prds.size()==0){
+			System.out.println("Could not find product id:"+rId);
+			return;
+		}
+		Product prd=prds.get(0);
+		Viewer.viewProduct(prd);
+		
 	}
 	
 	//--------------------------------delete data------------------------//
-	public static void delete(UserInterface src){
+	public static void delete(UserInterface ui){
 		System.out.println("Delete Data");
 		int dId=(int)Input.inputFloat("Product id");
-		OperationsControl.delete(dId);
-		UserInterface.defaultRecords=src.prdRecords;
+		if(ui.proDao.searchProductById(dId).size()==0){
+			System.out.println("Could not find product id:"+dId);
+			return;
+		}
+		if(!ui.proDao.deleteDataById(dId)){
+			System.out.println("Delete data failed!");
+			return;
+		}
+		System.out.println("Delete data succeed!");
+		
 	}
 	
 	//---------------------------------update data-------------------------//
-	public static void update(UserInterface src){
+	public static void update(UserInterface ui){
 		System.out.println("Update Data");
 		int uId=(int)Input.inputFloat("Product id");
-		OperationsControl.update(uId);
-		UserInterface.defaultRecords=src.prdRecords;
+		ArrayList<Product> prds=ui.proDao.searchProductById(uId);
+		if(prds.size()==0){
+			System.out.println("Cannot find id you entered. Please try again.");
+			return;
+		}
+		Scanner sc=new Scanner(System.in);
+		String ch;
+		Product pro=prds.get(0);
+		do{	
+			System.out.println("(1)Update All\t(2)Update Name\t(3)Update UnitPrice\t(4)Stock Quanity\t(5)Update Content\t(6)exit");
+			ch=sc.nextLine();
+			String name="";
+			float unit=0;
+			float qty=0;
+			String content="";
+			switch(ch){
+				case "1":
+					name=Input.inputString("name");
+					unit=Input.inputFloat("Unit Price");
+					qty=Input.inputFloat("Stock quantity:");
+					System.out.print("Content: ");
+					content=Input.inputContent();
+					pro.setName(name);
+					pro.setUnitPrice(unit);
+					pro.setStockQty(qty);
+					pro.setContent(content);
+					
+					if(!Input.Confirmation("Are you sure to udpate")){
+						System.out.println("cancel!");
+						break;
+					}
+					System.out.println("Updating...");
+					try {
+						ui.proDao.updateData(pro);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					System.out.println("upate all success");
+					break;
+					//return;
+				case "2": 
+					name=Input.inputString("name");
+					pro.setName(name);
+					if(!Input.Confirmation("Are you sure to udpate")){
+						System.out.println("cancel!");
+						break;
+					}
+					System.out.println("Updating...");
+					try {
+						ui.proDao.updateData(pro);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					System.out.println("upate name success");
+					break;
+				//return;
+				case "3": 
+					unit=Input.inputFloat("Unit Price");
+					pro.setUnitPrice(unit);
+					if(!Input.Confirmation("Are you sure to udpate")){
+						System.out.println("cancel!");
+						break;
+					}
+					System.out.println("Updating...");
+					try {
+						ui.proDao.updateData(pro);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					System.out.println("upate unitprice success");
+					break;
+				//return;
+				case "4": 
+					qty=Input.inputFloat("Stock quantity:");
+					pro.setStockQty(qty);
+					if(!Input.Confirmation("Are you sure to udpate")){
+						System.out.println("cancel!");
+						break;
+					}
+					System.out.println("Updating...");
+					try {
+						ui.proDao.updateData(pro);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					System.out.println("upate quantity success");
+					break;
+				//return;
+				case "5": 
+					System.out.print("Content: ");
+					content=Input.inputContent();
+					pro.setContent(content);
+					if(!Input.Confirmation("Are you sure to udpate")){
+						System.out.println("cancel!");
+						break;
+					}
+					System.out.println("Updating...");
+					try {
+						ui.proDao.updateData(pro);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+					System.out.println("upate content success");
+					break;
+					//return;
+				default: break;
+			}
+		}while(!ch.equals("6"));
 	}
 	
+	
 	//------------------------------------go to next page-----------------------------//
-	public static void next(UserInterface src){
+	public static void next(UserInterface ui){
 		System.out.println("Next Data");
-		src.currentPage.nextPage();
-		OperationsControl.displayProduct(UserInterface.prdRecords, src.currentPage);
+		ui.page.nextPage();
+		Viewer.displayProduct(ui.currentData, ui.page);
 	}
 	
 	//-------------------------------------go to previous page--------------------------//
-	public static void previous(UserInterface src){
+	public static void previous(UserInterface ui){
 		System.out.println("Previous Data");
-		src.currentPage.previousPage();
-		OperationsControl.displayProduct(UserInterface.prdRecords, src.currentPage);
+		ui.page.previousPage();
+		Viewer.displayProduct(ui.currentData, ui.page);
 	}
 	
 	//-------------------------------------go to first page---------------------------//
-	public static void first(UserInterface src){
+	public static void first(UserInterface ui){
 		System.out.println("First Data");
-		src.currentPage.firstPage();
-		OperationsControl.displayProduct(UserInterface.prdRecords, src.currentPage);
+		ui.page.firstPage();
+		Viewer.displayProduct(ui.currentData, ui.page);
 	}
 	
 	//----------------------------------------go to last page--------------------//
-	public static void last(UserInterface src){
+	public static void last(UserInterface ui){
 		System.out.println("Last Data");
-		src.currentPage.lastPage();
-		OperationsControl.displayProduct(UserInterface.prdRecords, src.currentPage);
+		ui.page.lastPage();
+		Viewer.displayProduct(ui.currentData, ui.page);
 	}
 	
 
@@ -99,22 +241,12 @@ public class UI_Function {
 		pages.setCurrentPage(page);
 	}
 	///----------------------------------------set row in a page---------------------//
-	public static void setRow(UserInterface src){
+	public static void setRow(UserInterface ui){
 		System.out.println("Set rows Data");
 		int rowSet=(int)Input.inputFloat("row in a page");
-		src.currentPage.setRecordPerPage(rowSet);
+		ui.page.setRecordPerPage(rowSet);
 	}
 	
-	///------------------------------------------save data----------------------------//
-	public static void save(){
-		System.out.println("Saving Data....");
-		try {
-			OperationsControl.save();
-			System.out.println("Saving success!");
-		} catch (Exception e) {
-			System.out.println("Failed to save!");
-		}
-	}
 	
 ///------------------------------------------backup file here------------------------------------///
 	public static void backup(){
@@ -164,12 +296,10 @@ public class UI_Function {
 			}
 			
 		}
-		if(!OperationsControl.Confirmation("Are you sure to restore")){
+		if(!Input.Confirmation("Are you sure to restore")){
 			System.out.println("Restore cancel!");
 			return;
 		}
-		OperationsControl.copyFile(back.listFiles()[ind-1], UserInterface.usingFile);
-		UserInterface.defaultRecords=OperationsControl.readData();
 		System.out.println("Your product has been restored!");
 	}
 	
@@ -183,38 +313,41 @@ public class UI_Function {
 			System.out.println("2.)Search by name");
 			System.out.println("3.)Search with all fields");
 			System.out.println("exit.) back to menu");
-			choice=Input.string("Option >");
+			choice=Input.inputString("Option >");
 			switch(choice){
 			case "1":
-				int id=(int)Input.Floats("Input search id:");
-				ArrayList<Product> idFound=StudentDAO.searchStudentById(id);
+				int id=(int)Input.inputFloat("Input search id:");
+				ArrayList<Product> idFound=ui.proDao.searchProductById(id);
+				
 				if(idFound.size()==0){
 					System.out.println("Could not find data id:"+id);
 					break;
 				}
-				
-				Viewer.displayData(Product.getFields(), idFound.toArray());
-				System.out.println("Total found:"+idFound.size()+" students");
+				//Viewer.displayData(Product.getFields(), idFound.toArray());
+				Viewer.displayProduct(idFound, ui.page);
+				System.out.println("Total found:"+idFound.size()+" products");
 				break;
 			case "2":
-				String name=Input.string("Input search name:");
-				ArrayList<Product> nameFound=StudentDAO.searchStudentByName(name);
+				String name=Input.inputString("Input search name:");
+				ArrayList<Product> nameFound=ui.proDao.searchProductByName(name);
 				if(nameFound.size()==0){
 					System.out.println("Could not match any name:"+name);
 					break;
 				}
-				Viewer.displayData(Product.getFields(), nameFound.toArray());
-				System.out.println("Total found:"+nameFound.size()+" students");
+				//Viewer.displayData(Product.getFields(), nameFound.toArray());
+				Viewer.displayProduct(nameFound, ui.page);
+				System.out.println("Total found:"+nameFound.size()+"products");
 				break;
 			case "3":
-				String rand=Input.string("Input search word:");
-				ArrayList<Product> randFound=StudentDAO.searchStudentByRandom(rand);
+				String rand=Input.inputString("Input search word:");
+				ArrayList<Product> randFound=ui.proDao.searchProductByRandom(rand);
 				if(randFound.size()==0){
 					System.out.println("Could not match any word:"+rand);
 					break;
 				}
-				Viewer.displayData(Product.getFields(), randFound.toArray());
-				System.out.println("Total found:"+randFound.size()+" students");
+				//Viewer.displayData(Product.getFields(), randFound.toArray());
+				Viewer.displayProduct(randFound, ui.page);
+				System.out.println("Total found:"+randFound.size()+"products");
 				break;
 			default:
 			}
@@ -224,7 +357,7 @@ public class UI_Function {
 	
 	///--------------------------------------exiting program-----------------------------------///
 	public static boolean exit(){
-		if(!Confirmation("Do you want to exit")){
+		if(!Input.Confirmation("Do you want to exit")){
 			return false;
 		}
 		return true;

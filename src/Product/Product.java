@@ -11,12 +11,12 @@ public class Product implements Serializable{
 	private String name;
 	private float unitPrice;
 	private float stockQty;
-	private Date impDate;
+	private String impDate;
 	private String content;
 /*-----------------------------end of fields-------------------------*/
 	
 /*--------------------------------constructors-------------------------*/
-	public Product(int id, String name, float up, float stockQty,Date impDate,String content){
+	public Product(int id, String name, float up, float stockQty,String impDate,String content){
 		this.id=id;
 		this.name=name;
 		this.unitPrice=up;
@@ -25,7 +25,7 @@ public class Product implements Serializable{
 		this.content=content;
 	}
 	public Product(){
-		this.impDate=new Date();
+		this.impDate=new Date().toString();
 	}
 	
 
@@ -43,7 +43,7 @@ public class Product implements Serializable{
 	
 /*------------------------------instance methods-------------------------*/
 	public Object[] getData(){	///return array of data
-		Object[] obj={this.id,this.name,this.unitPrice,this.stockQty,(this.impDate.getYear()+1900+"/"+(this.impDate.getMonth()+1)+"/"+ this.impDate.getDate())};
+		Object[] obj={this.id,this.name,this.unitPrice,this.stockQty,(this.impDate)};
 		return obj;
 	}
 	public void setData(String data) throws Exception{
@@ -60,7 +60,7 @@ public class Product implements Serializable{
     @SuppressWarnings("deprecation")
 	@Override
 	public String toString(){
-		return this.id+"/"+this.name+"/"+this.unitPrice+"/"+this.stockQty+"/"+(this.impDate.getYear()+1900+"/"+(this.impDate.getMonth()+1)+"/"+ this.impDate.getDate());
+		return this.id+"/"+this.name+"/"+this.unitPrice+"/"+this.stockQty+"/"+(this.impDate);
 	}
     
 	public int getId() {
@@ -95,11 +95,11 @@ public class Product implements Serializable{
 		this.stockQty = stockQty;
 	}
 
-	public Date getImpDate() {
+	public String getImpDate() {
 		return impDate;
 	}
 
-	public void setImpDate(Date impDate) {
+	public void setImpDate(String impDate) {
 		this.impDate = impDate;
 	}
 

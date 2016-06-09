@@ -53,5 +53,17 @@ public class Input {
 			return content.split(";")[0].trim();
 			
 		}
+		public static boolean Confirmation(String arg){
+			///add your code here
+			while(true){
+				System.out.println(arg+"[y/n] ?");
+				String s=new Scanner(System.in).next();
+				switch(s.toUpperCase()){
+				case "Y":return true;
+				case "N":return false;
+				default:break;
+				}
+			}
+		}
 }
 
