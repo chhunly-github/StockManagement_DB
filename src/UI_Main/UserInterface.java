@@ -11,7 +11,7 @@ public class UserInterface {
 	Pagination page;
 	ArrayList<Product> currentData;
 	ProductDAO proDao;
-	String search="";
+	boolean isSearch=false;
 /*------------------constructor------------------------*/
 	
 	public UserInterface(){

@@ -22,6 +22,7 @@ public class Viewer {
 		
 		//-------------------------------display product-----------------------////
 		public static void displayProduct(ArrayList<Product> prds,Pagination page){
+			
 			TableViewer.printHeader();
 			TableViewer.printData(prds, page);
 			TableViewer.printFooter(prds, page);

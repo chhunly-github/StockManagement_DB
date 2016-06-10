@@ -15,6 +15,7 @@ public class UI_Function {
 	}
 	public static void display(UserInterface ui){
 		System.out.println("Display Data");
+		ui.isSearch=false;
 		ui.page.calculate(ui.currentData.size());
 		Viewer.displayProduct(ui.currentData, ui.page);
 	}
