@@ -61,9 +61,20 @@ public class DbConnection {
 		}
 	}
 	
-	public static boolean createTable(String tbname){
-		//if(s)
-		return true;
+	public static boolean createTable(String tbname,String dbname){
+		try{
+			Connection cnn=DbConnection.getConnection(dbname);
+			String sql="CREATE TABLE "+tbname+"(id serial PRIMARY KEY , name VARCHAR(30), unitprice FLOAT, stockqty FLOAT, impdate VARCHAR(15), content VARCHAR(200));";
+			Statement st=cnn.createStatement();
+			//ps.setString(1, dbname);
+			st.executeUpdate(sql);
+			return true;
+		}catch(Exception e){
+			e.printStackTrace();
+		}finally{
+			DbConnection.closeConnection();
+		}
+		return false;
 	}
 	public static boolean createDatabase(String dbname){
 		try{
@@ -71,7 +82,7 @@ public class DbConnection {
 			String sql="CREATE DATABASE "+dbname+";";
 			Statement st=cnn.createStatement();
 			//ps.setString(1, dbname);
-			st.executeQuery(sql);
+			st.executeUpdate(sql);
 			return true;
 		}catch(Exception e){
 			e.printStackTrace();

@@ -25,10 +25,10 @@ public class UI_Function {
 		
 		System.out.println("--------------------------**************************-----------------------");
 		System.out.println("-------------------------------Add new product-------------------------");
-		//int id=(int)Input.inputFloat("Input id:");
 		int id=ui.proDao.idGenerated();
-		System.out.println("ID\t:"+id);
-		String name=Input.inputString("Input name:");
+		//int id=(int)Input.inputFloat("Input id");
+		//System.out.println("ID\t:"+id);
+		String name=Input.inputString("Input name");
 		float unit=Input.inputFloat("Unit Price");
 		float qty=Input.inputFloat("Stock quantity:");
 		System.out.print("Content: ");
@@ -212,6 +212,7 @@ public class UI_Function {
 	public static void first(UserInterface ui){
 		System.out.println("First Data");
 		ui.page.firstPage();
+		
 		Viewer.displayProduct(ui.currentData, ui.page);
 	}
 	
@@ -363,10 +364,14 @@ public class UI_Function {
 		case "W":
 			try{
 				Product p=new Product();
-				int id=ui.proDao.idGenerated();
+				//int id=ui.proDao.idGenerated();
+				int id=0;
 				p.setData(id+"-"+arr[1]);
 				System.out.println("Writing data...");
-				ui.proDao.insertData(p);
+				if(!ui.proDao.insertData(p)){
+					System.out.println("Failed to insert data!");
+					return;
+				};
 				System.out.println("Writing data success!");
 			}catch(Exception e){
 				System.out.println("Invalid format for shortcut writing data.");
@@ -376,7 +381,8 @@ public class UI_Function {
 		case "R":
 			try{
 				int id=Integer.parseInt(arr[1]);
-				Viewer.displayProduct(ui.proDao.searchProductById(id), ui.page);
+				//Viewer.displayProduct(ui.proDao.searchProductById(id), ui.page);
+				Viewer.viewProduct(ui.proDao.searchProductById(id).get(0));
 			}catch(Exception e){
 				System.out.println("Product id must be integer!");
 			}

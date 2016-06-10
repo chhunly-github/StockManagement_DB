@@ -11,7 +11,16 @@ public class Pagination {
 	public int getCurrentPage() {
 		return currentPage;
 	}
-
+	
+	/*public int offSet(){
+		int of=currentPage*recordPerPage-
+	}
+	public int getLastData(){
+		if(currentPage==totalPage){
+			return totalRecord;
+		}
+		return currentPage*recordPerPage;
+	}*/
 
 	public void setCurrentPage(int currentPage) {
 		if(currentPage>totalPage||currentPage<=0)
@@ -166,7 +175,6 @@ public class Pagination {
 		return currentPage;
 		
 	}
-	
 	
 	///---------------------------------//
 }

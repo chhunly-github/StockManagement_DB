@@ -11,30 +11,20 @@ public class UserInterface {
 	Pagination page;
 	ArrayList<Product> currentData;
 	ProductDAO proDao;
+	String search="";
 /*------------------constructor------------------------*/
 	
 	public UserInterface(){
 		
-		long st=System.currentTimeMillis();
-		long et=System.currentTimeMillis();
-		System.out.println((et-st)/1000+" seconds");
-		System.out.println("Checking recovery...!");
 		proDao=new ProductDAO();
 		currentData=proDao.getAllProducts();
+		
+		DbConnection.createDatabase(ProductDAO.databaseName());
+		DbConnection.createTable(ProductDAO.tableName(),ProductDAO.databaseName());
+		
 		page=new Pagination(proDao.numberOfProduct());
 		Menu();
-		/*try{
-			DbConnection.getConnection("");
-			System.out.println("Connected!");
-		}catch(Exception e){
-			e.printStackTrace();
-			System.out.println("Failed to connect");
-		}
-		if(!DbConnection.createDatabase("dbtest")){
-			System.out.println("Failed to create!");
-		}else{
-			System.out.println("Successfully created!");
-		}*/
+		
 			
 	}
 /*---------------end of constructor------------------------*/

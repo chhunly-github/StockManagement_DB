@@ -44,7 +44,6 @@ public class TableViewer {
 		if(page.getTotalPage()==0)
 			return;
 		int t=0;
-		//System.out.println(prdRecords.size());
 		
 		int dec=page.getTotalPage()*page.getRecordPerPage()>prdRecords.size()?page.getTotalPage()*page.getRecordPerPage()-prdRecords.size():0;
 		int start=page.getRecordPerPage()*(page.getTotalPage()-page.getCurrentPage()+1)-1-dec;

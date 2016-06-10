@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
+import Pagination.Pagination;
 import Product.Product;
 
 public class ProductDAO {
@@ -23,11 +24,12 @@ public class ProductDAO {
 		return result;
 	}
 	
+	
 	public ArrayList<Product> getAllProducts(){
 		ArrayList<Product> products=new ArrayList<>();
 		Connection cnn = null;
 		try {
-			cnn=DbConnection.getConnection("dbProduct");
+			cnn=DbConnection.getConnection(this.databaseName());
 			String sql="SELECT * FROM tbproduct ORDER BY id";
 			Statement st=cnn.createStatement();
 			ResultSet rs=st.executeQuery(sql);
@@ -35,7 +37,7 @@ public class ProductDAO {
 				int id=rs.getInt("id");
 				String name=rs.getString("name");
 				Float unitprice=rs.getFloat("unitprice");
-				Float quantity=rs.getFloat("quantity");
+				Float quantity=rs.getFloat("stockqty");
 				String impdate=rs.getString("impdate");
 				String content=rs.getString("content");
 				products.add(new Product(id, name, unitprice, quantity, impdate, content));
@@ -57,7 +59,7 @@ public class ProductDAO {
 	public ArrayList<Product> searchProductById(int id){
 		ArrayList<Product> products=new ArrayList<>();
 		try {
-			Connection cnn=DbConnection.getConnection("dbStudent");
+			Connection cnn=DbConnection.getConnection(this.databaseName());
 			String sql="SELECT * FROM tbproduct WHERE id=?";
 			PreparedStatement st=cnn.prepareStatement(sql);
 			st.setInt(1, id);
@@ -66,7 +68,7 @@ public class ProductDAO {
 				//int id=rs.getInt("id");
 				String name=rs.getString("name");
 				Float unitprice=rs.getFloat("unitprice");
-				Float quantity=rs.getFloat("quantity");
+				Float quantity=rs.getFloat("stockqty");
 				String impdate=rs.getString("impdate");
 				String content=rs.getString("content");
 				products.add(new Product(id, name, unitprice, quantity, impdate, content));
@@ -80,7 +82,7 @@ public class ProductDAO {
 	public ArrayList<Product> searchProductByName(String sname){
 		ArrayList<Product> products=new ArrayList<>();
 		try {
-			Connection cnn=DbConnection.getConnection("dbProduct");
+			Connection cnn=DbConnection.getConnection(this.databaseName());
 			String sql="SELECT * FROM tbproduct WHERE name like ? ORDER BY id";
 			PreparedStatement st=cnn.prepareStatement(sql);
 			st.setString(1, "%"+sname+"%");
@@ -89,7 +91,7 @@ public class ProductDAO {
 				int id=rs.getInt("id");
 				String name=rs.getString("name");
 				Float unitprice=rs.getFloat("unitprice");
-				Float quantity=rs.getFloat("quantity");
+				Float quantity=rs.getFloat("stockqty");
 				String impdate=rs.getString("impdate");
 				String content=rs.getString("content");
 				products.add(new Product(id, name, unitprice, quantity, impdate, content));
@@ -114,15 +116,15 @@ public class ProductDAO {
 	
 	public boolean insertData(Product prd){
 		try {
-			Connection cnn=DbConnection.getConnection("dbProduct");
-			String sql="INSERT INTO tbproduct VALUES(?,?,?,?,?)";
+			Connection cnn=DbConnection.getConnection(this.databaseName());
+			String sql="INSERT INTO tbproduct(name,unitprice,stockqty,impdate,content) VALUES(?,?,?,?,?)";
 			PreparedStatement pps=cnn.prepareStatement(sql);
-			pps.setInt(1, prd.getId());
-			pps.setString(2, prd.getName());
-			pps.setFloat(3, prd.getUnitPrice());
-			pps.setFloat(4, prd.getStockQty());
-			pps.setString(5, prd.getImpDate());
-			pps.setString(6, prd.getContent());
+			//pps.setInt(1, prd.getId());
+			pps.setString(1, prd.getName());
+			pps.setFloat(2, prd.getUnitPrice());
+			pps.setFloat(3, prd.getStockQty());
+			pps.setString(4, prd.getImpDate());
+			pps.setString(5, prd.getContent());
 			
 			pps.executeUpdate();
 			return true;
@@ -130,14 +132,14 @@ public class ProductDAO {
 		} catch (ClassNotFoundException e) {
 			e.printStackTrace();
 		} catch (SQLException e) {
-			
+			e.printStackTrace();
 		}
 		return false;
 	}
 	public boolean updateData(Product prd){
 		try {
-			Connection cnn=DbConnection.getConnection("dbProduct");
-			String sql="UPDATE tbproduct SET name=?,unitprice=?,quantity=?,content=? WHERE id=?;";
+			Connection cnn=DbConnection.getConnection(this.databaseName());
+			String sql="UPDATE tbproduct SET name=?,unitprice=?,stockqty=?,content=? WHERE id=?;";
 			PreparedStatement pps=cnn.prepareStatement(sql);
 			
 			pps.setString(1, prd.getName());
@@ -145,9 +147,8 @@ public class ProductDAO {
 			pps.setFloat(3, prd.getStockQty());
 			pps.setString(4, prd.getContent());
 			pps.setInt(5, prd.getId());
-			
+
 			pps.executeUpdate();
-			
 			return true;
 			
 		} catch (ClassNotFoundException e) {
@@ -161,7 +162,7 @@ public class ProductDAO {
 	/*--------------------------------------delete data-------------------------------*/
 	public boolean deleteDataById(int id){
 		try {
-			Connection cnn=DbConnection.getConnection("dbProduct");
+			Connection cnn=DbConnection.getConnection(this.databaseName());
 			String sql="DELETE FROM tbproduct WHERE id=?";
 			PreparedStatement pps=cnn.prepareStatement(sql);
 			pps.setInt(1, id);
@@ -178,7 +179,7 @@ public class ProductDAO {
 	
 	public boolean deleteDataByName(String name){
 		try {
-			Connection cnn=DbConnection.getConnection("dbProduct");
+			Connection cnn=DbConnection.getConnection(this.databaseName());
 			String sql="DELETE FROM tbproduct WHERE name=?";
 			PreparedStatement pps=cnn.prepareStatement(sql);
 			pps.setString(1, name);
@@ -194,8 +195,8 @@ public class ProductDAO {
 	}
 	public boolean deleteAll(){
 		try {
-			Connection cnn=DbConnection.getConnection("dbProduct");
-			String sql="DELETE FROM tbproduct";
+			Connection cnn=DbConnection.getConnection(this.databaseName());
+			String sql="DELETE FROM "+this.tableName()+";";
 			PreparedStatement pps=cnn.prepareStatement(sql);
 			pps.executeUpdate();
 			cnn.close();
@@ -211,15 +212,18 @@ public class ProductDAO {
 	/*------------------------------------get all amount of product-------------------*/
 	public int numberOfProduct(){
 		try{
-			Connection cnn=DbConnection.getConnection("dbProduct");
-			String getCount="SELECT COUNT FROM tbproduct";
+			Connection cnn=DbConnection.getConnection(this.databaseName());
+			String getCount="SELECT COUNT(1) FROM tbproduct;";
 			Statement stm=cnn.createStatement();
-			int count=stm.executeQuery(getCount).getRow();
+			ResultSet rs=stm.executeQuery(getCount);
+			rs.next();
+			int count=rs.getInt(1);
+			//System.out.println("hello!");
 			return count;
 		}catch(SQLException e){
-			
+			e.printStackTrace();
 		}catch (ClassNotFoundException e) {
-			
+			e.printStackTrace();
 		}
 		return 0;
 	}
@@ -227,7 +231,15 @@ public class ProductDAO {
 	/*----------------------------------id generator-------------------*/
 	public int idGenerated(){
 		int i=this.numberOfProduct();
-		return ++i;
+		return i+1;
+	}
+	
+	/*----------------------------------create database generator-------------------*/
+	public static String tableName(){
+		return "tbproduct";
+	}
+	public static String databaseName(){
+		return "dbproduct";
 	}
 	
 
