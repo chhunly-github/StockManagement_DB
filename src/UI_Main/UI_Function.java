@@ -1,23 +1,12 @@
 package UI_Main;
 
 import java.io.File;
-import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Scanner;
 
-import org.omg.PortableInterceptor.USER_EXCEPTION;
-
-import Controller.Input;
-import DAO.ProductDAO;
-import DAO.StudentDAO;
-import DTO_Model.Student;
-import Operations.OperationsControl;
-import Pagination.Pagination;
 import Product.Product;
-import UI_Main.*;
 import Viewer.Viewer;
 
 public class UI_Function {
@@ -36,7 +25,9 @@ public class UI_Function {
 		
 		System.out.println("--------------------------**************************-----------------------");
 		System.out.println("-------------------------------Add new product-------------------------");
-		int id=(int)Input.inputFloat("Input id:");
+		//int id=(int)Input.inputFloat("Input id:");
+		int id=ui.proDao.idGenerated();
+		System.out.println("ID\t:"+id);
 		String name=Input.inputString("Input name:");
 		float unit=Input.inputFloat("Unit Price");
 		float qty=Input.inputFloat("Stock quantity:");
@@ -233,12 +224,14 @@ public class UI_Function {
 	
 
 	//-----------------goto page?----------------------*/
-	public static void gotoPage(int page,Pagination pages){
-		if(pages.getTotalPage()<page||page<=0){
-			System.out.println("The page you entered is not invalid! Please try again!(1 - "+pages.getTotalPage()+")");
+	public static void gotoPage(UserInterface ui){
+		int page=(int)Input.inputFloat("Go to page");
+		ui.page.calculate(ui.proDao.numberOfProduct());
+		if(ui.page.getTotalPage()<page||page<=0){
+			System.out.println("The page you entered is not invalid! Please try again!(1 - "+ui.page.getTotalPage()+")");
 			return;
 		}
-		pages.setCurrentPage(page);
+		ui.page.setCurrentPage(page);
 	}
 	///----------------------------------------set row in a page---------------------//
 	public static void setRow(UserInterface ui){
@@ -364,20 +357,16 @@ public class UI_Function {
 	}
 	
 	///----------------------------------------shortcut input-----------------------------------///
-	public static void shortcut(String c, UserInterface src){
+	public static void shortcut(String c, UserInterface ui){
 		String[] arr=c.split("#");
 		switch(arr[0].toUpperCase()){
 		case "W":
 			try{
 				Product p=new Product();
-				int id=0;
-				if(!UserInterface.defaultRecords.isEmpty()){
-					id=UserInterface.defaultRecords.get(UserInterface.defaultRecords.size()-1).getId()+1;
-				}
+				int id=ui.proDao.idGenerated();
 				p.setData(id+"-"+arr[1]);
-				UserInterface.defaultRecords.add(p);
 				System.out.println("Writing data...");
-				OperationsControl.saveTemp(UserInterface.defaultRecords);
+				ui.proDao.insertData(p);
 				System.out.println("Writing data success!");
 			}catch(Exception e){
 				System.out.println("Invalid format for shortcut writing data.");
@@ -387,7 +376,7 @@ public class UI_Function {
 		case "R":
 			try{
 				int id=Integer.parseInt(arr[1]);
-				OperationsControl.viewProduct(UserInterface.defaultRecords, id);
+				Viewer.displayProduct(ui.proDao.searchProductById(id), ui.page);
 			}catch(Exception e){
 				System.out.println("Product id must be integer!");
 			}
@@ -400,34 +389,22 @@ public class UI_Function {
 					break;
 				}
 				int id=Integer.parseInt(u[0]);
-				
-				Product pro=null;
-				for(Product p:UserInterface.defaultRecords){
-					if(p.getId()==id){
-						pro=p;
-						break;
-					}
-				}
-				if(pro==null){
-					System.out.println("Cannot find id you entered. Please try again.");
+				if(ui.proDao.searchProductById(id).size()==0){
+					System.out.println("Cannot find id you entered.");
 					break;
 				}
 				
+				if(!Input.Confirmation("Are you sure to udpate")){					
+					System.out.println("Update cancel!");
+					break;
+				}
+				System.out.println("Updating...");
 				Product temp=new Product();
 				temp.setData(arr[1]);
-				if(OperationsControl.Confirmation("Are you sure to udpate")){
-					System.out.println("Updating...");
-					pro.setContent(temp.getContent());
-					pro.setName(temp.getName());
-					pro.setUnitPrice(temp.getUnitPrice());
-					pro.setStockQty(temp.getStockQty());
-					OperationsControl.saveTemp(UserInterface.defaultRecords);
-					System.out.println("Data has been updated!");
-					break;
-				}
-				System.out.println("Update cancel!");
+				ui.proDao.updateData(temp);
+				System.out.println("Data has been updated!");
 			}catch(Exception e){
-				
+				System.out.println("Failed to update data.");
 			}
 			break;
 		case "D":
@@ -438,12 +415,18 @@ public class UI_Function {
 					break;
 				}
 				if(d[0].equalsIgnoreCase("a")){
-					OperationsControl.deleteAll();
+					if(!Input.Confirmation("Are you sure to delete all data")){
+						break;
+					}
+					ui.proDao.deleteAll();
 					break;
 				}
 				int id=Integer.parseInt(d[0]);
-				OperationsControl.delete(id);
-				
+				if(!ui.proDao.deleteDataById(id)){
+					System.out.println("Deleting data failed.");
+					break;
+				}
+				System.out.println("Data has been successfully deleted!");
 			}catch(Exception e){
 				System.out.println("Invalid format for shortcut updating data.");
 			}
@@ -456,14 +439,14 @@ public class UI_Function {
 					break;
 				}
 				System.out.println(arr[1]);
-				ArrayList<Product> result=OperationsControl.search(UserInterface.defaultRecords, arr[1]);
+				ArrayList<Product> result=ui.proDao.searchProductByRandom(arr[1]);
 				if(result.size()==0){
 					System.out.println("Search not found!");
 					break;
 				}
-				UserInterface.prdRecords=result;
-				src.currentPage.calculate(UserInterface.prdRecords.size());
-				OperationsControl.displayProduct(UserInterface.prdRecords, src.currentPage);
+				ui.currentData=result;
+				ui.page.calculate(result.size());
+				Viewer.displayProduct(result, ui.page);
 			}catch(Exception e){
 				
 			}

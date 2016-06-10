@@ -1,21 +1,11 @@
 package UI_Main;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.rmi.server.Operation;
 import java.util.ArrayList;
-import java.util.Scanner;
 
+import DAO.DbConnection;
 import DAO.ProductDAO;
-import Operations.OperationsControl;
 import Pagination.Pagination;
 import Product.Product;
-import Viewer.TableViewer;
 
 public class UserInterface {
 	Pagination page;
@@ -30,8 +20,21 @@ public class UserInterface {
 		System.out.println((et-st)/1000+" seconds");
 		System.out.println("Checking recovery...!");
 		proDao=new ProductDAO();
+		currentData=proDao.getAllProducts();
 		page=new Pagination(proDao.numberOfProduct());
 		Menu();
+		/*try{
+			DbConnection.getConnection("");
+			System.out.println("Connected!");
+		}catch(Exception e){
+			e.printStackTrace();
+			System.out.println("Failed to connect");
+		}
+		if(!DbConnection.createDatabase("dbtest")){
+			System.out.println("Failed to create!");
+		}else{
+			System.out.println("Successfully created!");
+		}*/
 			
 	}
 /*---------------end of constructor------------------------*/
@@ -45,7 +48,7 @@ public class UserInterface {
 			System.out.printf("%80s","+===================================================================================+\n");
 			System.out.printf("%80s","|*)Display | W)rite | R)ead | U)pdate | D)elete | F)irst | P)revious | N)ext | L)ast|\n");
 			System.out.printf("%80s","|                                                                                   |\n");
-			System.out.printf("%80s","|     S)earch | G)oto | Se)t row | Sa)ve | B)ackup | Re)store | H)elp | E)xit       |\n");
+			System.out.printf("%80s","|     S)earch | G)oto | Se)t row |  B)ackup | Re)store | H)elp | E)xit              |\n");
 			System.out.printf("%80s","+===================================================================================+\n");
 			System.out.println();
 			//System.out.print("Option >");
@@ -85,7 +88,7 @@ public class UserInterface {
 					break;
 				case "S":/*------------------------------search product---------------------*/
 					//System.out.println("Input search >");
-					UI_Function.search(this);
+					UI_Function.Search(this);
 					break;
 				case "G":/*------------------------------go to a specific page---------------------*/
 					UI_Function.gotoPage(this);
@@ -93,9 +96,9 @@ public class UserInterface {
 				case "SE":/*------------------------------set number of rows in a page---------------------*/
 					UI_Function.setRow(this);
 					break;
-				case "SA":/*------------------------------save any changed to using file---------------------*/
+/*				case "SA":------------------------------save any changed to using file---------------------
 					UI_Function.save();
-					break;
+					break;*/
 				case "B":/*------------------------------backup data to backup file---------------------*/
 					System.out.println("Backup Data");
 					UI_Function.backup();

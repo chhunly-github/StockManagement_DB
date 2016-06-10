@@ -224,4 +224,11 @@ public class ProductDAO {
 		return 0;
 	}
 	
+	/*----------------------------------id generator-------------------*/
+	public int idGenerated(){
+		int i=this.numberOfProduct();
+		return ++i;
+	}
+	
+
 }
