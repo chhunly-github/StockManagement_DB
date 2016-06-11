@@ -1,6 +1,7 @@
 package Product;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.Comparator;
 import java.util.Date;
 
@@ -25,7 +26,9 @@ public class Product implements Serializable{
 		this.content=content;
 	}
 	public Product(){
-		this.impDate=new Date().toString();
+		//this.impDate=new Date().toString();
+		SimpleDateFormat sdf=new SimpleDateFormat("yyyy/MM/dd");
+		this.impDate=sdf.format(new Date());
 	}
 	
 

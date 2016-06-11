@@ -16,8 +16,8 @@ public class UI_Function {
 	public static void display(UserInterface ui){
 		System.out.println("Display Data");
 		ui.isSearch=false;
-		ui.page.calculate(ui.currentData.size());
-		Viewer.displayProduct(ui.currentData, ui.page);
+		ui.page.calculate(ui.proDao.numberOfProduct());
+		Viewer.displayProduct(ui.proDao.getDataByPage(ui.page), ui.page);
 	}
 	
 	//----------------------------------write new product----------------------//
@@ -199,14 +199,14 @@ public class UI_Function {
 	public static void next(UserInterface ui){
 		System.out.println("Next Data");
 		ui.page.nextPage();
-		Viewer.displayProduct(ui.currentData, ui.page);
+		Viewer.displayProduct(ui.proDao.getDataByPage(ui.page), ui.page);
 	}
 	
 	//-------------------------------------go to previous page--------------------------//
 	public static void previous(UserInterface ui){
 		System.out.println("Previous Data");
 		ui.page.previousPage();
-		Viewer.displayProduct(ui.currentData, ui.page);
+		Viewer.displayProduct(ui.proDao.getDataByPage(ui.page), ui.page);
 	}
 	
 	//-------------------------------------go to first page---------------------------//
@@ -214,14 +214,14 @@ public class UI_Function {
 		System.out.println("First Data");
 		ui.page.firstPage();
 		
-		Viewer.displayProduct(ui.currentData, ui.page);
+		Viewer.displayProduct(ui.proDao.getDataByPage(ui.page), ui.page);
 	}
 	
 	//----------------------------------------go to last page--------------------//
 	public static void last(UserInterface ui){
 		System.out.println("Last Data");
 		ui.page.lastPage();
-		Viewer.displayProduct(ui.currentData, ui.page);
+		Viewer.displayProduct(ui.proDao.getDataByPage(ui.page), ui.page);
 	}
 	
 
@@ -234,6 +234,7 @@ public class UI_Function {
 			return;
 		}
 		ui.page.setCurrentPage(page);
+		Viewer.displayProduct(ui.proDao.getDataByPage(ui.page), ui.page);
 	}
 	///----------------------------------------set row in a page---------------------//
 	public static void setRow(UserInterface ui){
@@ -385,7 +386,7 @@ public class UI_Function {
 				//Viewer.displayProduct(ui.proDao.searchProductById(id), ui.page);
 				Viewer.viewProduct(ui.proDao.searchProductById(id).get(0));
 			}catch(Exception e){
-				System.out.println("Product id must be integer!");
+				System.out.println("Product id you entered is not available!");
 			}
 			break;
 		case "U":

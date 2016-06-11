@@ -45,16 +45,16 @@ public class TableViewer {
 			return;
 		int t=0;
 		
-		int dec=page.getTotalPage()*page.getRecordPerPage()>prdRecords.size()?page.getTotalPage()*page.getRecordPerPage()-prdRecords.size():0;
+		/*int dec=page.getTotalPage()*page.getRecordPerPage()>prdRecords.size()?page.getTotalPage()*page.getRecordPerPage()-prdRecords.size():0;
 		int start=page.getRecordPerPage()*(page.getTotalPage()-page.getCurrentPage()+1)-1-dec;
 		int lastdata=start-page.getRecordPerPage();
 		if(lastdata<0)
-			lastdata=0;
+			lastdata=0;*/
 		
-		for(int i=start;i>=lastdata;i--){
+		for(Product p:prdRecords){
 			System.out.print("|");
-			for(int j=0;j<prdRecords.get(i).getData().length;j++){
-				System.out.printf("%-15s",prdRecords.get(i).getData()[j]);
+			for(int j=0;j<p.getData().length;j++){
+				System.out.printf("%-15s",p.getData()[j]);
 				if(j!=Product.getFields().length-1)
 					System.out.print("|");
 			}
@@ -78,12 +78,12 @@ public class TableViewer {
 /*--------------------end of print data of table-------------------------*/
 
 /*-------------------------print footer of table-------------------------*/	
-	public static void printFooter(ArrayList<Product> prdRecords, Pagination p){
+	public static void printFooter(int record, Pagination p){
 		
 		System.out.print("|");
 		String margin="      ";
 		String page="Page: "+p.getCurrentPage()+"/"+p.getTotalPage();
-		String totalRecord="Total Records: "+prdRecords.size();
+		String totalRecord="Total Records: "+record;
 		int leftspace=15*(Product.getFields().length) - (margin.length()*2+page.length()+totalRecord.length())+Product.getFields().length-1;
 		System.out.print(margin+page);
 		for(int i=0;i<leftspace;i++)

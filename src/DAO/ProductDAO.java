@@ -56,6 +56,41 @@ public class ProductDAO {
 		}
 		return products;	
 	}
+	public ArrayList<Product> getDataByPage(Pagination page){
+		ArrayList<Product> products=new ArrayList<>();
+		Connection cnn = null;
+		try {
+			cnn=DbConnection.getConnection(this.databaseName());
+			String sql="SELECT * FROM tbproduct ORDER BY id limit ? offset ?";
+			//Statement st=cnn.createStatement();
+			PreparedStatement ps=cnn.prepareStatement(sql);
+			ps.setInt(1, page.getRecordPerPage());
+			ps.setInt(2, page.offSet());
+			System.out.println(page.offSet()+"offset here;");
+			ResultSet rs=ps.executeQuery();
+			while(rs.next()){
+				int id=rs.getInt("id");
+				String name=rs.getString("name");
+				Float unitprice=rs.getFloat("unitprice");
+				Float quantity=rs.getFloat("stockqty");
+				String impdate=rs.getString("impdate");
+				String content=rs.getString("content");
+				products.add(new Product(id, name, unitprice, quantity, impdate, content));
+			}
+			
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
+		}
+		finally{
+			if(cnn!=null)
+				try {
+					cnn.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+		}
+		return products;
+	}
 	public ArrayList<Product> searchProductById(int id){
 		ArrayList<Product> products=new ArrayList<>();
 		try {

@@ -25,6 +25,6 @@ public class Viewer {
 			
 			TableViewer.printHeader();
 			TableViewer.printData(prds, page);
-			TableViewer.printFooter(prds, page);
+			TableViewer.printFooter(page.getTotalRecord(), page);
 		}
 }
