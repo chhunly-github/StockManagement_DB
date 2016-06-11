@@ -20,7 +20,7 @@ public class GetById implements IGetData{
 		Connection cnn = null;
 		try {
 			cnn=DbConnection.getConnection(ProductDAO.databaseName());
-			String sql="SELECT * FROM tbproduct WHERE id = ? ORDER BY id limit ? offset ?";
+			String sql="SELECT * FROM tbproduct WHERE id = ? ";
 			//Statement st=cnn.createStatement();
 			PreparedStatement ps=cnn.prepareStatement(sql);
 			ps.setInt(1, this.id);

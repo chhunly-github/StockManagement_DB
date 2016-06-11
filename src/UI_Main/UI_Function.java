@@ -6,9 +6,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
 
+import DAO.GetByContent;
 import DAO.GetById;
 import DAO.GetByName;
-import DAO.GetByRandoms;
 import Product.Product;
 import Viewer.Viewer;
 
@@ -20,7 +20,7 @@ public class UI_Function {
 		System.out.println("Display Data");
 		//ui.isSearch=false;
 		ui.page.calculate(ui.proDao.numberOfProduct());
-		Viewer.displayProduct(ui.proDao.getDataByPage(ui.page), ui.page);
+		Viewer.displayProduct(ui.igetdata.getData(ui.page, ""), ui.page);
 	}
 	
 	//----------------------------------write new product----------------------//
@@ -29,9 +29,7 @@ public class UI_Function {
 		
 		System.out.println("--------------------------**************************-----------------------");
 		System.out.println("-------------------------------Add new product-------------------------");
-		int id=ui.proDao.idGenerated();
-		//int id=(int)Input.inputFloat("Input id");
-		//System.out.println("ID\t:"+id);
+		
 		String name=Input.inputString("Input name");
 		float unit=Input.inputFloat("Unit Price");
 		float qty=Input.inputFloat("Stock quantity:");
@@ -41,7 +39,7 @@ public class UI_Function {
 		SimpleDateFormat sdf=new SimpleDateFormat("yyyy/MM/dd");
 		String date=sdf.format(new Date());
 		//System.out.println(sdf.format(new java.util.Date()));
-		if(!ui.proDao.insertData(new Product(id,name,unit,qty,date,content))){
+		if(!ui.proDao.insertData(new Product(0,name,unit,qty,date,content))){
 			System.out.println("Failed to insert data, data may duplicate primary key.");
 			return;
 		}
@@ -315,7 +313,7 @@ public class UI_Function {
 			System.out.println("--------------------------Student searching data------------------------");
 			System.out.println("1.)Search by id");
 			System.out.println("2.)Search by name");
-			System.out.println("3.)Search with all fields");
+			System.out.println("3.)Search by name and content");
 			System.out.println("exit.) back to menu");
 			choice=Input.inputString("Option >");
 			switch(choice){
@@ -338,31 +336,32 @@ public class UI_Function {
 			case "2":
 				String name=Input.inputString("Input search name:");
 				ui.igetdata=new GetByName(name);
-				ArrayList<Product> nameFound=ui.proDao.searchProductByName(name);
-				if(nameFound.size()==0){
+				int nameFound=ui.proDao.searchCountProductByName(name);
+				if(nameFound==0){
 					System.out.println("Could not match any name:"+name);
 					break;
 				}
-				ui.page.calculate(nameFound.size());
+				ui.page.calculate(nameFound);
 				//Viewer.displayData(Product.getFields(), nameFound.toArray());
 				//Viewer.displayProduct(nameFound, ui.page);
 				Viewer.displayProduct(ui.igetdata.getData(ui.page, ""), ui.page);
-				System.out.println("Total found:"+nameFound.size()+"products");
+				System.out.println("Total found:"+nameFound+"products");
 				choice="exit";
 				break;
 			case "3":
 				String rand=Input.inputString("Input search word:");
-				ui.igetdata=new GetByRandoms();
-				ArrayList<Product> randFound=ui.proDao.searchProductByRandom(rand);
-				if(randFound.size()==0){
+				ui.igetdata=new GetByContent();
+				int contentFound=ui.proDao.searchCountProductByContent(rand);
+				if(contentFound==0){
+					
 					System.out.println("Could not match any word:"+rand);
 					break;
 				}
-				ui.page.calculate(randFound.size());
+				ui.page.calculate(contentFound);
 				//Viewer.displayData(Product.getFields(), randFound.toArray());
 				//Viewer.displayProduct(randFound, ui.page);
 				Viewer.displayProduct(ui.igetdata.getData(ui.page, ""), ui.page);
-				System.out.println("Total found:"+randFound.size()+"products");
+				System.out.println("Total found:"+contentFound+" products");
 				choice="exit";
 				break;
 			default:
@@ -450,6 +449,11 @@ public class UI_Function {
 					break;
 				}
 				int id=Integer.parseInt(d[0]);
+				if(ui.proDao.searchProductById(id).size()==0){
+					System.out.println("Data not found!");
+					break;
+				}
+				if(!Input.Confirmation("Are you sure to delete the product"));
 				if(!ui.proDao.deleteDataById(id)){
 					System.out.println("Deleting data failed.");
 					break;
@@ -467,14 +471,14 @@ public class UI_Function {
 					break;
 				}
 				System.out.println(arr[1]);
-				ArrayList<Product> result=ui.proDao.searchProductByRandom(arr[1]);
-				if(result.size()==0){
+				int result=ui.proDao.searchCountProductByContent(arr[1]);
+				if(result==0){
 					System.out.println("Search not found!");
 					break;
 				}
-				ui.currentData=result;
-				ui.page.calculate(result.size());
-				Viewer.displayProduct(result, ui.page);
+				ui.igetdata=new GetByName(arr[1]);
+				ui.page.calculate(result);
+				Viewer.displayProduct(ui.igetdata.getData(ui.page, ""), ui.page);
 			}catch(Exception e){
 				
 			}

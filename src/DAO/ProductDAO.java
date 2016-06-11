@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.Random;
 
 import Pagination.Pagination;
 import Product.Product;
@@ -56,41 +57,7 @@ public class ProductDAO {
 		}
 		return products;	
 	}
-	public ArrayList<Product> getDataByPage(Pagination page){
-		ArrayList<Product> products=new ArrayList<>();
-		Connection cnn = null;
-		try {
-			cnn=DbConnection.getConnection(this.databaseName());
-			String sql="SELECT * FROM tbproduct ORDER BY id limit ? offset ?";
-			//Statement st=cnn.createStatement();
-			PreparedStatement ps=cnn.prepareStatement(sql);
-			ps.setInt(1, page.getRecordPerPage());
-			ps.setInt(2, page.offSet());
-			System.out.println(page.offSet()+"offset here;");
-			ResultSet rs=ps.executeQuery();
-			while(rs.next()){
-				int id=rs.getInt("id");
-				String name=rs.getString("name");
-				Float unitprice=rs.getFloat("unitprice");
-				Float quantity=rs.getFloat("stockqty");
-				String impdate=rs.getString("impdate");
-				String content=rs.getString("content");
-				products.add(new Product(id, name, unitprice, quantity, impdate, content));
-			}
-			
-		} catch (ClassNotFoundException | SQLException e) {
-			e.printStackTrace();
-		}
-		finally{
-			if(cnn!=null)
-				try {
-					cnn.close();
-				} catch (SQLException e) {
-					e.printStackTrace();
-				}
-		}
-		return products;
-	}
+	
 	public ArrayList<Product> searchProductById(int id){
 		ArrayList<Product> products=new ArrayList<>();
 		try {
@@ -114,15 +81,17 @@ public class ProductDAO {
 		}
 		return products;
 	}
-	public ArrayList<Product> searchProductByName(String sname){
-		ArrayList<Product> products=new ArrayList<>();
+	public int searchCountProductByName(String sname){
+		//ArrayList<Product> products=new ArrayList<>();
 		try {
 			Connection cnn=DbConnection.getConnection(this.databaseName());
-			String sql="SELECT * FROM tbproduct WHERE name like ? ORDER BY id";
+			String sql="SELECT COUNT(1) tbproduct WHERE name like ? ORDER BY id";
 			PreparedStatement st=cnn.prepareStatement(sql);
 			st.setString(1, "%"+sname+"%");
 			ResultSet rs=st.executeQuery();
-			while(rs.next()){
+			rs.next();
+			int count=rs.getInt(1);
+			/*while(rs.next()){
 				int id=rs.getInt("id");
 				String name=rs.getString("name");
 				Float unitprice=rs.getFloat("unitprice");
@@ -130,25 +99,30 @@ public class ProductDAO {
 				String impdate=rs.getString("impdate");
 				String content=rs.getString("content");
 				products.add(new Product(id, name, unitprice, quantity, impdate, content));
-			}
-			
+				
+			}*/
+			return count;
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
 		}
-		return products;
+		return 0;
 	}
-	public ArrayList<Product> searchProductByRandom(String search){
-		ArrayList<Product> prds=new ProductDAO().getAllProducts();
-		ArrayList<Product> products=new ArrayList<>();
-		for(Product prd:prds){
-			if((prd.toString().replace('/', ' ')).toUpperCase().contains(search.toUpperCase())){
-				products.add(prd);
-			}
-			//System.out.println(st.toString().replace('/', ' '));
+	public int searchCountProductByContent(String search){
+		try {
+			Connection cnn=DbConnection.getConnection(this.databaseName());
+			String sql="SELECT COUNT(1) tbproduct WHERE content like ?;";
+			PreparedStatement st=cnn.prepareStatement(sql);
+			st.setString(1, "%"+search+"%");
+			ResultSet rs=st.executeQuery();
+			rs.next();
+			int count=rs.getInt(1);
+			return count;
+		} catch (ClassNotFoundException | SQLException e) {
+			e.printStackTrace();
 		}
-		return products;
+		return 0;
 	}
-	
+	/*------------------------------------insert data----------------------------*/
 	public boolean insertData(Product prd){
 		try {
 			Connection cnn=DbConnection.getConnection(this.databaseName());
@@ -171,6 +145,58 @@ public class ProductDAO {
 		}
 		return false;
 	}
+	/*------------------------------------test data-------------------------------*/
+	public boolean insertTestData(){
+		String[] sql={"INSERT INTO tbproduct(name,unitprice,stockqty,impdate,content) VALUES('anchor',?,?,?,?)",
+				"INSERT INTO tbproduct(name,unitprice,stockqty,impdate,content) VALUES('cocacola',?,?,?,?)",
+				"INSERT INTO tbproduct(name,unitprice,stockqty,impdate,content) VALUES('vital',?,?,?,?)",
+				"INSERT INTO tbproduct(name,unitprice,stockqty,impdate,content) VALUES('hi-tech',?,?,?,?)",
+				"INSERT INTO tbproduct(name,unitprice,stockqty,impdate,content) VALUES('dazani',?,?,?,?)",
+				"INSERT INTO tbproduct(name,unitprice,stockqty,impdate,content) VALUES('euro-tech',?,?,?,?)",
+				"INSERT INTO tbproduct(name,unitprice,stockqty,impdate,content) VALUES('mama',?,?,?,?)",
+				"INSERT INTO tbproduct(name,unitprice,stockqty,impdate,content) VALUES('abc',?,?,?,?)",
+				"INSERT INTO tbproduct(name,unitprice,stockqty,impdate,content) VALUES('ankor',?,?,?,?)",
+				"INSERT INTO tbproduct(name,unitprice,stockqty,impdate,content) VALUES('doubleA',?,?,?,?)",
+				"INSERT INTO tbproduct(name,unitprice,stockqty,impdate,content) VALUES('number 1',?,?,?,?)",
+				"INSERT INTO tbproduct(name,unitprice,stockqty,impdate,content) VALUES('nike',?,?,?,?)",
+				"INSERT INTO tbproduct(name,unitprice,stockqty,impdate,content) VALUES('gatsby',?,?,?,?)",
+				"INSERT INTO tbproduct(name,unitprice,stockqty,impdate,content) VALUES('aloe vera',?,?,?,?)",
+				"INSERT INTO tbproduct(name,unitprice,stockqty,impdate,content) VALUES('sagiko',?,?,?,?)",
+				"INSERT INTO tbproduct(name,unitprice,stockqty,impdate,content) VALUES('freshy',?,?,?,?)",
+				"INSERT INTO tbproduct(name,unitprice,stockqty,impdate,content) VALUES('bacchus',?,?,?,?)",
+				"INSERT INTO tbproduct(name,unitprice,stockqty,impdate,content) VALUES('aquarius',?,?,?,?)",
+				"INSERT INTO tbproduct(name,unitprice,stockqty,impdate,content) VALUES('pokarisvet',?,?,?,?)"
+		
+		};
+		int i=0;
+		/*int month=1;
+		int day=1;*/
+		while(i<sql.length){
+			try {
+				Connection cnn=DbConnection.getConnection(this.databaseName());
+				PreparedStatement pps=cnn.prepareStatement(sql[i]);
+				pps.setFloat(1, i*5);
+				pps.setFloat(2, i*8);
+				Random rand=new Random();
+				pps.setString(3, 2016+"/"+/*(int)12*rand.nextFloat()*/2+/*(int)12*rand.nextFloat()*/2);
+				pps.setString(4, "content"+i);
+				pps.executeUpdate();
+				i++;
+				continue;
+			} catch (ClassNotFoundException e) {
+				//e.printStackTrace();
+				System.out.println("Driver not found!");
+				return false;
+			} catch (SQLException e) {
+				e.printStackTrace();
+				System.out.println("Cannot insert data");
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	/*--------------------------------------update data-----------------------*/
 	public boolean updateData(Product prd){
 		try {
 			Connection cnn=DbConnection.getConnection(this.databaseName());
@@ -253,6 +279,7 @@ public class ProductDAO {
 			ResultSet rs=stm.executeQuery(getCount);
 			rs.next();
 			int count=rs.getInt(1);
+			
 			//System.out.println("hello!");
 			return count;
 		}catch(SQLException e){
@@ -263,12 +290,7 @@ public class ProductDAO {
 		return 0;
 	}
 	
-	/*----------------------------------id generator-------------------*/
-	public int idGenerated(){
-		int i=this.numberOfProduct();
-		return i+1;
-	}
-	
+
 	/*----------------------------------create database generator-------------------*/
 	public static String tableName(){
 		return "tbproduct";

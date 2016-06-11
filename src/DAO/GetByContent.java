@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import Pagination.Pagination;
 import Product.Product;
 
-public class GetAllByPage implements IGetData{
+public class GetByContent implements IGetData{
 
 	@Override
 	public ArrayList<Product> getData(Pagination page, String arg) {
@@ -17,11 +17,12 @@ public class GetAllByPage implements IGetData{
 		Connection cnn = null;
 		try {
 			cnn=DbConnection.getConnection(ProductDAO.databaseName());
-			String sql="SELECT * FROM tbproduct ORDER BY id desc limit ? offset ?";
+			String sql="SELECT * FROM tbproduct WHERE content like ? ORDER BY id limit ? offset ?";
 			
 			PreparedStatement ps=cnn.prepareStatement(sql);
-			ps.setInt(1, page.getRecordPerPage());
-			ps.setInt(2, page.offSet());
+			ps.setString(1, "%"+arg+"%");
+			ps.setInt(2, page.getRecordPerPage());
+			ps.setInt(3, page.offSet());
 			System.out.println(page.offSet()+"offset here;");
 			ResultSet rs=ps.executeQuery();
 			while(rs.next()){

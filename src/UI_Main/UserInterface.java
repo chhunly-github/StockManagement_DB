@@ -24,7 +24,7 @@ public class UserInterface {
 		
 		DbConnection.createDatabase(ProductDAO.databaseName());
 		DbConnection.createTable(ProductDAO.tableName(),ProductDAO.databaseName());
-		
+		//proDao.insertTestData();
 		page=new Pagination(proDao.numberOfProduct());
 		Menu();
 		

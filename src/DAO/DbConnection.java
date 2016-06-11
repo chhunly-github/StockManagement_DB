@@ -69,8 +69,12 @@ public class DbConnection {
 			//ps.setString(1, dbname);
 			st.executeUpdate(sql);
 			return true;
-		}catch(Exception e){
-			e.printStackTrace();
+		}catch(SQLException e){
+			//e.printStackTrace();
+			System.out.println("table existed!");
+		} catch (ClassNotFoundException e) {
+			//e.printStackTrace();
+			System.err.println("Driver not found!");
 		}finally{
 			DbConnection.closeConnection();
 		}
@@ -84,8 +88,13 @@ public class DbConnection {
 			//ps.setString(1, dbname);
 			st.executeUpdate(sql);
 			return true;
-		}catch(Exception e){
-			e.printStackTrace();
+		}catch(SQLException e){
+			//e.printStackTrace();
+			System.err.println("Can't connect to database!");
+			
+		} catch (ClassNotFoundException e) {
+			//e.printStackTrace();
+			System.err.println("Driver not found!");
 		}finally{
 			DbConnection.closeConnection();
 		}
