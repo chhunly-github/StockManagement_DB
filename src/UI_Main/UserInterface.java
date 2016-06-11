@@ -3,6 +3,8 @@ package UI_Main;
 import java.util.ArrayList;
 
 import DAO.DbConnection;
+import DAO.GetAllByPage;
+import DAO.IGetData;
 import DAO.ProductDAO;
 import Pagination.Pagination;
 import Product.Product;
@@ -11,7 +13,8 @@ public class UserInterface {
 	Pagination page;
 	ArrayList<Product> currentData;
 	ProductDAO proDao;
-	boolean isSearch=false;
+	//boolean isSearch=false;
+	IGetData igetdata;
 /*------------------constructor------------------------*/
 	
 	public UserInterface(){
@@ -50,6 +53,8 @@ public class UserInterface {
 			}
 			switch (choice.toUpperCase()) {
 				case "*":/*------------------------------display all data---------------------*/
+					page.calculate(proDao.numberOfProduct());
+					igetdata=new GetAllByPage();
 					UI_Function.display(this);
 					break;
 				case "W":/*------------------------------write new data---------------------*/

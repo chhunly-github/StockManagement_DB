@@ -9,24 +9,19 @@ import java.util.ArrayList;
 import Pagination.Pagination;
 import Product.Product;
 
-public class GetByName implements IGetData{
-	private String searchName;
-	public GetByName(String searchname){
-		this.searchName=searchname;
-	}
+public class GetAllByPage implements IGetData{
+
 	@Override
 	public ArrayList<Product> getData(Pagination page, String arg) {
 		ArrayList<Product> products=new ArrayList<>();
 		Connection cnn = null;
 		try {
 			cnn=DbConnection.getConnection(ProductDAO.databaseName());
-			String sql="SELECT * FROM tbproduct WHERE name like ? ORDER BY id limit ? offset ?";
-			//Statement st=cnn.createStatement();
+			String sql="SELECT * FROM tbproduct ORDER BY id limit ? offset ?";
 			
 			PreparedStatement ps=cnn.prepareStatement(sql);
-			ps.setString(1, "%"+this.searchName+"%");
-			ps.setInt(2, page.getRecordPerPage());
-			ps.setInt(3, page.offSet());
+			ps.setInt(1, page.getRecordPerPage());
+			ps.setInt(2, page.offSet());
 			System.out.println(page.offSet()+"offset here;");
 			ResultSet rs=ps.executeQuery();
 			while(rs.next()){

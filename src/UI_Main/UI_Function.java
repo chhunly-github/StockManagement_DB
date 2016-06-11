@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
 
+import DAO.GetById;
+import DAO.GetByName;
+import DAO.GetByRandoms;
 import Product.Product;
 import Viewer.Viewer;
 
@@ -15,7 +18,7 @@ public class UI_Function {
 	}
 	public static void display(UserInterface ui){
 		System.out.println("Display Data");
-		ui.isSearch=false;
+		//ui.isSearch=false;
 		ui.page.calculate(ui.proDao.numberOfProduct());
 		Viewer.displayProduct(ui.proDao.getDataByPage(ui.page), ui.page);
 	}
@@ -199,14 +202,16 @@ public class UI_Function {
 	public static void next(UserInterface ui){
 		System.out.println("Next Data");
 		ui.page.nextPage();
-		Viewer.displayProduct(ui.proDao.getDataByPage(ui.page), ui.page);
+		//Viewer.displayProduct(ui.proDao.getDataByPage(ui.page), ui.page);
+		Viewer.displayProduct(ui.igetdata.getData(ui.page, ""), ui.page);
 	}
 	
 	//-------------------------------------go to previous page--------------------------//
 	public static void previous(UserInterface ui){
 		System.out.println("Previous Data");
 		ui.page.previousPage();
-		Viewer.displayProduct(ui.proDao.getDataByPage(ui.page), ui.page);
+		//Viewer.displayProduct(ui.proDao.getDataByPage(ui.page), ui.page);
+		Viewer.displayProduct(ui.igetdata.getData(ui.page, ""), ui.page);
 	}
 	
 	//-------------------------------------go to first page---------------------------//
@@ -214,14 +219,16 @@ public class UI_Function {
 		System.out.println("First Data");
 		ui.page.firstPage();
 		
-		Viewer.displayProduct(ui.proDao.getDataByPage(ui.page), ui.page);
+		//Viewer.displayProduct(ui.proDao.getDataByPage(ui.page), ui.page);
+		Viewer.displayProduct(ui.igetdata.getData(ui.page, ""), ui.page);
 	}
 	
 	//----------------------------------------go to last page--------------------//
 	public static void last(UserInterface ui){
 		System.out.println("Last Data");
 		ui.page.lastPage();
-		Viewer.displayProduct(ui.proDao.getDataByPage(ui.page), ui.page);
+		//Viewer.displayProduct(ui.proDao.getDataByPage(ui.page), ui.page);
+		Viewer.displayProduct(ui.igetdata.getData(ui.page, ""), ui.page);
 	}
 	
 
@@ -234,7 +241,8 @@ public class UI_Function {
 			return;
 		}
 		ui.page.setCurrentPage(page);
-		Viewer.displayProduct(ui.proDao.getDataByPage(ui.page), ui.page);
+		//Viewer.displayProduct(ui.proDao.getDataByPage(ui.page), ui.page);
+		Viewer.displayProduct(ui.igetdata.getData(ui.page, ""), ui.page);
 	}
 	///----------------------------------------set row in a page---------------------//
 	public static void setRow(UserInterface ui){
@@ -312,7 +320,9 @@ public class UI_Function {
 			choice=Input.inputString("Option >");
 			switch(choice){
 			case "1":
+				
 				int id=(int)Input.inputFloat("Input search id:");
+				ui.igetdata=new GetById(id);
 				ArrayList<Product> idFound=ui.proDao.searchProductById(id);
 				
 				if(idFound.size()==0){
@@ -320,30 +330,40 @@ public class UI_Function {
 					break;
 				}
 				//Viewer.displayData(Product.getFields(), idFound.toArray());
-				Viewer.displayProduct(idFound, ui.page);
+				ui.page.calculate(idFound.size());
+				Viewer.displayProduct(ui.igetdata.getData(ui.page, ""), ui.page);
 				System.out.println("Total found:"+idFound.size()+" products");
+				choice="exit";
 				break;
 			case "2":
 				String name=Input.inputString("Input search name:");
+				ui.igetdata=new GetByName(name);
 				ArrayList<Product> nameFound=ui.proDao.searchProductByName(name);
 				if(nameFound.size()==0){
 					System.out.println("Could not match any name:"+name);
 					break;
 				}
+				ui.page.calculate(nameFound.size());
 				//Viewer.displayData(Product.getFields(), nameFound.toArray());
-				Viewer.displayProduct(nameFound, ui.page);
+				//Viewer.displayProduct(nameFound, ui.page);
+				Viewer.displayProduct(ui.igetdata.getData(ui.page, ""), ui.page);
 				System.out.println("Total found:"+nameFound.size()+"products");
+				choice="exit";
 				break;
 			case "3":
 				String rand=Input.inputString("Input search word:");
+				ui.igetdata=new GetByRandoms();
 				ArrayList<Product> randFound=ui.proDao.searchProductByRandom(rand);
 				if(randFound.size()==0){
 					System.out.println("Could not match any word:"+rand);
 					break;
 				}
+				ui.page.calculate(randFound.size());
 				//Viewer.displayData(Product.getFields(), randFound.toArray());
-				Viewer.displayProduct(randFound, ui.page);
+				//Viewer.displayProduct(randFound, ui.page);
+				Viewer.displayProduct(ui.igetdata.getData(ui.page, ""), ui.page);
 				System.out.println("Total found:"+randFound.size()+"products");
+				choice="exit";
 				break;
 			default:
 			}

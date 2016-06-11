@@ -10,18 +10,22 @@ import Pagination.Pagination;
 import Product.Product;
 
 public class GetById implements IGetData{
-
+	private int id;
+	public GetById(int id) {
+		this.id=id;
+	}
 	@Override
-	public ArrayList<Object> getData(Pagination page, String arg) {
-		ArrayList<Object> products=new ArrayList<>();
+	public ArrayList<Product> getData(Pagination page, String arg) {
+		ArrayList<Product> products=new ArrayList<>();
 		Connection cnn = null;
 		try {
 			cnn=DbConnection.getConnection(ProductDAO.databaseName());
-			String sql="SELECT * FROM tbproduct ORDER BY id limit ? offset ?";
+			String sql="SELECT * FROM tbproduct WHERE id = ? ORDER BY id limit ? offset ?";
 			//Statement st=cnn.createStatement();
 			PreparedStatement ps=cnn.prepareStatement(sql);
-			ps.setInt(1, page.getRecordPerPage());
-			ps.setInt(2, page.offSet());
+			ps.setInt(1, this.id);
+			ps.setInt(2, page.getRecordPerPage());
+			ps.setInt(3, page.offSet());
 			System.out.println(page.offSet()+"offset here;");
 			ResultSet rs=ps.executeQuery();
 			while(rs.next()){
