@@ -6,10 +6,18 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
 
+import org.postgresql.jdbc2.ArrayAssistantRegistry;
+
 import DAO.GetByContent;
 import DAO.GetById;
 import DAO.GetByName;
+import DAO.GetByReport;
+import DAO.IGetData;
+import DAO.IReport;
+import DAO.ProductReport;
+import Pagination.Pagination;
 import Product.Product;
+import Viewer.ImageViewer;
 import Viewer.Viewer;
 
 public class UI_Function {
@@ -55,13 +63,12 @@ public class UI_Function {
 			return;
 		}
 		int rId=(int)Input.inputFloat("Product id ");
-		ArrayList<Product> prds=ui.proDao.searchProductById(rId);
-		if(prds.size()==0){
+		Product prds=new GetById(rId).getProduct();
+		if(prds==null){
 			System.out.println("Could not find product id:"+rId);
 			return;
 		}
-		Product prd=prds.get(0);
-		Viewer.viewProduct(prd);
+		Viewer.viewProduct(prds);
 		
 	}
 	
@@ -69,7 +76,7 @@ public class UI_Function {
 	public static void delete(UserInterface ui){
 		System.out.println("Delete Data");
 		int dId=(int)Input.inputFloat("Product id");
-		if(ui.proDao.searchProductById(dId).size()==0){
+		if(ui.proDao.searchCountProductById(dId)==0){
 			System.out.println("Could not find product id:"+dId);
 			return;
 		}
@@ -85,14 +92,14 @@ public class UI_Function {
 	public static void update(UserInterface ui){
 		System.out.println("Update Data");
 		int uId=(int)Input.inputFloat("Product id");
-		ArrayList<Product> prds=ui.proDao.searchProductById(uId);
-		if(prds.size()==0){
+		int prds=ui.proDao.searchCountProductById(uId);
+		Product pro=new GetById(uId).getProduct();
+		if(pro==null){
 			System.out.println("Cannot find id you entered. Please try again.");
 			return;
 		}
 		Scanner sc=new Scanner(System.in);
-		String ch;
-		Product pro=prds.get(0);
+		String ch="";
 		do{	
 			System.out.println("(1)Update All\t(2)Update Name\t(3)Update UnitPrice\t(4)Stock Quanity\t(5)Update Content\t(6)exit");
 			ch=sc.nextLine();
@@ -251,35 +258,30 @@ public class UI_Function {
 	
 	
 ///------------------------------------------backup file here------------------------------------///
-	public static void backup(){
-		Date d=new Date();
-		String filename="Backup Files/backup_"+(d.getYear()+1900)+"_"+(d.getMonth()+1)+"_"+ d.getDate()+"_"+d.getTime()+".bac";
-		/*File back=new File(filename);
-		
-         if (back.getParentFile() != null) {
-             back.getParentFile().mkdirs();
-         }
-         OperationsControl.copyFile(UserInterface.usingFile, back);*/
-		
-		//change to data backup with db
+	public static void shotScreen(){
+		try {
+			System.out.println("File has been save to file: "+new ScreenShoter().robo());
+		} catch (Exception e) {
+			//e.printStackTrace();
+			System.out.println("Failed to create screenshot");
+		}
 	}
-	
-	//-----------------------------------------restore data here----------------------------------///
-	public static void restore(){
+	//---------------------------------------view screenshot-------------------------//
+public static void viewScreenShot(UserInterface ui){
 		
-		File back=new File("Backup Files");
-		if(back.listFiles().length==0){
-			System.out.println("There's no backup file here!");
+		File screenShot=new File("ScreenShots");
+		File[] files=screenShot.listFiles();
+		if(files.length==0){
+			System.out.println("There's no report file here!");
 			return;
 		}
 		int ind=0;
-		for(File s:back.listFiles()){
+		for(File s:files){
 			System.out.println((ind+1)+". "+s.getName());
 			ind++;
 		}
-		
 		while(true){
-			System.out.println("Choose backup file by enter number to restore:\nType \"c\" to cancel restore");
+			System.out.println("Choose report file by enter number to view:\nType \"c\" to go back");
 			try{
 				String s;
 				s=Input.inputString("Your choice");
@@ -287,7 +289,59 @@ public class UI_Function {
 					return;
 				}
 				ind=Integer.parseInt(s);
-				if(ind<=0||ind>back.listFiles().length){
+				if(ind<=0||ind>files.length){
+					System.err.println("\nChoice you enter is not available! Try again!\n");
+					continue;
+				}
+				new ImageViewer(files[ind-1].toString()).view();
+				//break;
+				
+			}catch(Exception e){
+				System.err.println("\nInvalid input! Try again!\n");
+			}
+		}
+		
+		
+	}
+	
+	//--------------------------------------export report to a file--------------//
+	public static void exportReport(UserInterface ui){
+		IReport report=new ProductReport();
+		ArrayList<Product> exp=ui.igetdata.getData(ui.page, "");
+		if(exp.isEmpty()){
+			System.out.println("Cannot export empty data.");
+			return;
+		}
+		if(!report.create(exp)){
+			System.out.println("Failed to create report!");
+			return;
+		}
+		System.out.println("Report has been write to file: "+report.toString());
+	}
+	
+	//-----------------------------------------restore data here----------------------------------///
+	public static void getReport(UserInterface ui){
+		
+		File reports=new File("Reports");
+		if(reports.listFiles().length==0){
+			System.out.println("There's no report file here!");
+			return;
+		}
+		int ind=0;
+		for(File s:reports.listFiles()){
+			System.out.println((ind+1)+". "+s.getName());
+			ind++;
+		}
+		while(true){
+			System.out.println("Choose report file by enter number to view:\nType \"c\" to go back");
+			try{
+				String s;
+				s=Input.inputString("Your choice");
+				if(s.equalsIgnoreCase("c")){
+					return;
+				}
+				ind=Integer.parseInt(s);
+				if(ind<=0||ind>reports.listFiles().length){
 					System.err.println("\nChoice you enter is not available! Try again!\n");
 					continue;
 				}
@@ -296,13 +350,22 @@ public class UI_Function {
 			}catch(Exception e){
 				System.err.println("\nInvalid input! Try again!\n");
 			}
-			
 		}
-		if(!Input.Confirmation("Are you sure to restore")){
-			System.out.println("Restore cancel!");
+		ArrayList<Product> prd=new ArrayList<>();
+		try{
+			prd=(ArrayList<Product>) new ProductReport().get(reports.listFiles()[ind-1].getPath());
+		}catch(Exception e){
+			System.out.println("Unknown file type! This file is not a kind of product report.");
+			//return;
+		}
+		if(prd==null){
+			System.out.println("Empty!");
 			return;
 		}
-		System.out.println("Your product has been restored!");
+		ui.igetdata=new GetByReport(prd);
+		ui.page.calculate(prd.size());
+		Viewer.displayProduct(ui.igetdata.getData(ui.page, ""), ui.page);
+		
 	}
 	
 	////----------------------------------------------input search data-------------------------------------///
@@ -321,16 +384,16 @@ public class UI_Function {
 				
 				int id=(int)Input.inputFloat("Input search id:");
 				ui.igetdata=new GetById(id);
-				ArrayList<Product> idFound=ui.proDao.searchProductById(id);
+				int idFound=ui.proDao.searchCountProductById(id);
 				
-				if(idFound.size()==0){
+				if(idFound==0){
 					System.out.println("Could not find data id:"+id);
 					break;
 				}
 				//Viewer.displayData(Product.getFields(), idFound.toArray());
-				ui.page.calculate(idFound.size());
+				ui.page.calculate(idFound);
 				Viewer.displayProduct(ui.igetdata.getData(ui.page, ""), ui.page);
-				System.out.println("Total found:"+idFound.size()+" products");
+				System.out.println("Total found:"+idFound+" products");
 				choice="exit";
 				break;
 			case "2":
@@ -403,7 +466,7 @@ public class UI_Function {
 			try{
 				int id=Integer.parseInt(arr[1]);
 				//Viewer.displayProduct(ui.proDao.searchProductById(id), ui.page);
-				Viewer.viewProduct(ui.proDao.searchProductById(id).get(0));
+				Viewer.viewProduct(new GetById(id).getProduct());
 			}catch(Exception e){
 				System.out.println("Product id you entered is not available!");
 			}
@@ -416,7 +479,7 @@ public class UI_Function {
 					break;
 				}
 				int id=Integer.parseInt(u[0]);
-				if(ui.proDao.searchProductById(id).size()==0){
+				if(ui.proDao.searchCountProductById(id)==0){
 					System.out.println("Cannot find id you entered.");
 					break;
 				}
@@ -449,7 +512,7 @@ public class UI_Function {
 					break;
 				}
 				int id=Integer.parseInt(d[0]);
-				if(ui.proDao.searchProductById(id).size()==0){
+				if(ui.proDao.searchCountProductById(id)==0){
 					System.out.println("Data not found!");
 					break;
 				}

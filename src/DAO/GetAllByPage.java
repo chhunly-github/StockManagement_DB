@@ -35,10 +35,9 @@ public class GetAllByPage implements IGetData{
 			}
 			
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			//e.printStackTrace();
 		}
 		finally{
 			if(cnn!=null)

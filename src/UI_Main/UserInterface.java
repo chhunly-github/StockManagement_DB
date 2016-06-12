@@ -38,11 +38,11 @@ public class UserInterface {
 		//display data here
 		do{
 			System.out.println();
-			System.out.printf("%80s","+===================================================================================+\n");
-			System.out.printf("%80s","|*)Display | W)rite | R)ead | U)pdate | D)elete | F)irst | P)revious | N)ext | L)ast|\n");
-			System.out.printf("%80s","|                                                                                   |\n");
-			System.out.printf("%80s","|     S)earch | G)oto | Se)t row |  B)ackup | Re)store | H)elp | E)xit              |\n");
-			System.out.printf("%80s","+===================================================================================+\n");
+			System.out.printf("+================================================================================================+\n");
+			System.out.printf("| *)Display | W)rite | R)ead | U)pdate | D)elete | F)irst | P)revious | N)ext | L)ast | S)earch  |\n");
+			System.out.printf("|                                                                                                |\n");
+			System.out.printf("|  G)oto | Se)t row |  Sh)otScreen | V)iew Shots | Re)ports | Exp)ort to report | H)elp | E)xit  |\n");
+			System.out.printf("+================================================================================================+\n");
 			System.out.println();
 			//System.out.print("Option >");
 			//choice="";
@@ -94,14 +94,23 @@ public class UserInterface {
 /*				case "SA":------------------------------save any changed to using file---------------------
 					UI_Function.save();
 					break;*/
-				case "B":/*------------------------------backup data to backup file---------------------*/
-					System.out.println("Backup Data");
-					UI_Function.backup();
+				case "SH":/*------------------------------backup data to backup file---------------------*/
+					System.out.println("shot screen");
+					UI_Function.shotScreen();
+					break;
+				case "V":/*------------------------------restore data from a backup file to using file---------------------*/
+					System.out.println("view image");
+					UI_Function.viewScreenShot(this);
 					break;
 				case "RE":/*------------------------------restore data from a backup file to using file---------------------*/
-					System.out.println("Restore Data");
-					UI_Function.restore();
+					System.out.println("report");
+					UI_Function.getReport(this);
 					break;
+				case "EXP":/*------------------------------restore data from a backup file to using file---------------------*/
+					System.out.println("export report");
+					UI_Function.exportReport(this);
+					break;
+				
 				case "H":/*------------------------------information on using shortcut key---------------------*/
 					UI_Function.showHelp();
 					break;

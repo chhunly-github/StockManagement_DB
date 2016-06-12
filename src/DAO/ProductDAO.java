@@ -31,7 +31,7 @@ public class ProductDAO {
 		Connection cnn = null;
 		try {
 			cnn=DbConnection.getConnection(this.databaseName());
-			String sql="SELECT * FROM tbproduct ORDER BY id";
+			String sql="SELECT id FROM tbproduct ORDER BY id";
 			Statement st=cnn.createStatement();
 			ResultSet rs=st.executeQuery(sql);
 			while(rs.next()){
@@ -58,34 +58,27 @@ public class ProductDAO {
 		return products;	
 	}
 	
-	public ArrayList<Product> searchProductById(int id){
+	public int searchCountProductById(int id){
 		ArrayList<Product> products=new ArrayList<>();
 		try {
 			Connection cnn=DbConnection.getConnection(this.databaseName());
-			String sql="SELECT * FROM tbproduct WHERE id=?";
+			String sql="SELECT id FROM tbproduct WHERE id=?";
 			PreparedStatement st=cnn.prepareStatement(sql);
 			st.setInt(1, id);
 			ResultSet rs=st.executeQuery();
-			while(rs.next()){
-				//int id=rs.getInt("id");
-				String name=rs.getString("name");
-				Float unitprice=rs.getFloat("unitprice");
-				Float quantity=rs.getFloat("stockqty");
-				String impdate=rs.getString("impdate");
-				String content=rs.getString("content");
-				products.add(new Product(id, name, unitprice, quantity, impdate, content));
-			}
-			
+			rs.next();
+			int count=rs.getInt(1);
+			return count;
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
 		}
-		return products;
+		return 0;
 	}
 	public int searchCountProductByName(String sname){
 		//ArrayList<Product> products=new ArrayList<>();
 		try {
 			Connection cnn=DbConnection.getConnection(this.databaseName());
-			String sql="SELECT COUNT(1) tbproduct WHERE name like ? ORDER BY id";
+			String sql="SELECT id FROM tbproduct WHERE name like ? ORDER BY id";
 			PreparedStatement st=cnn.prepareStatement(sql);
 			st.setString(1, "%"+sname+"%");
 			ResultSet rs=st.executeQuery();
@@ -110,7 +103,7 @@ public class ProductDAO {
 	public int searchCountProductByContent(String search){
 		try {
 			Connection cnn=DbConnection.getConnection(this.databaseName());
-			String sql="SELECT COUNT(1) tbproduct WHERE content like ?;";
+			String sql="SELECT * FROM tbproduct WHERE content like ?;";
 			PreparedStatement st=cnn.prepareStatement(sql);
 			st.setString(1, "%"+search+"%");
 			ResultSet rs=st.executeQuery();
