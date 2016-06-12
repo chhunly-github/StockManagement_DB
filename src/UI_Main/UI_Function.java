@@ -1,6 +1,8 @@
 package UI_Main;
 
+import java.awt.Desktop;
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -293,7 +295,15 @@ public static void viewScreenShot(UserInterface ui){
 					System.err.println("\nChoice you enter is not available! Try again!\n");
 					continue;
 				}
-				new ImageViewer(files[ind-1].toString()).view();
+				//new ImageViewer(files[ind-1].toString()).view();
+				File file = new File (files[ind-1].toString());
+				Desktop desktop = Desktop.getDesktop();
+				try {
+					desktop.open(file);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 				//break;
 				
 			}catch(Exception e){

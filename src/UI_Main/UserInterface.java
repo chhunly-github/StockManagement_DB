@@ -1,5 +1,8 @@
 package UI_Main;
 
+import java.awt.Desktop;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import DAO.DbConnection;
@@ -11,7 +14,6 @@ import Product.Product;
 
 public class UserInterface {
 	Pagination page;
-	ArrayList<Product> currentData;
 	ProductDAO proDao;
 	//boolean isSearch=false;
 	IGetData igetdata;
@@ -20,7 +22,6 @@ public class UserInterface {
 	public UserInterface(){
 		
 		proDao=new ProductDAO();
-		currentData=proDao.getAllProducts();
 		
 		DbConnection.createDatabase(ProductDAO.databaseName());
 		DbConnection.createTable(ProductDAO.tableName(),ProductDAO.databaseName());
