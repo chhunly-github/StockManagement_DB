@@ -1,4 +1,4 @@
-package DAO;
+package DAO.Implements;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -7,11 +7,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-
-import Product.Product;
+import DAO.Interfaces.IReport;
 
 
 public class ProductReport implements IReport{
@@ -26,7 +22,7 @@ public class ProductReport implements IReport{
 		if(obj==null){
 			return false;
 		}
-		ArrayList<Product> prds;
+		/*ArrayList<Product> prds;
 		try{
 			prds=(ArrayList<Product>) obj;
 		}catch(Exception e){
@@ -34,14 +30,14 @@ public class ProductReport implements IReport{
 		}
 		for(Product p:prds){
 			System.out.println(p.toString());
-		}
+		}*/
 		ObjectOutputStream oos=null;
 		try{
 			this.reportName=setName();
 			FileOutputStream fos=new FileOutputStream("Reports/"+this.reportName);
 			BufferedOutputStream bos=new BufferedOutputStream(fos);
 			oos=new ObjectOutputStream(bos);
-			oos.writeObject(prds);
+			oos.writeObject(obj);
 			return true;
 		}catch(IOException e){
 			

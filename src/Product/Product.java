@@ -2,7 +2,6 @@ package Product;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
-import java.util.Comparator;
 import java.util.Date;
 
 ///starting class product
@@ -60,7 +59,6 @@ public class Product implements Serializable{
 		
 	}
     
-    @SuppressWarnings("deprecation")
 	@Override
 	public String toString(){
 		return this.id+"/"+this.name+"/"+this.unitPrice+"/"+this.stockQty+"/"+(this.impDate);

@@ -8,18 +8,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
 
-import org.postgresql.jdbc2.ArrayAssistantRegistry;
-
-import DAO.GetByContent;
-import DAO.GetById;
-import DAO.GetByName;
-import DAO.GetByReport;
-import DAO.IGetData;
-import DAO.IReport;
-import DAO.ProductReport;
-import Pagination.Pagination;
+import DAO.Implements.GetByContent;
+import DAO.Implements.GetById;
+import DAO.Implements.GetByName;
+import DAO.Implements.GetByReport;
+import DAO.Implements.ProductReport;
+import DAO.Interfaces.IReport;
 import Product.Product;
-import Viewer.ImageViewer;
 import Viewer.Viewer;
 
 public class UI_Function {
@@ -28,7 +23,6 @@ public class UI_Function {
 	}
 	public static void display(UserInterface ui){
 		System.out.println("Display Data");
-		//ui.isSearch=false;
 		ui.page.calculate(ui.proDao.numberOfProduct());
 		Viewer.displayProduct(ui.igetdata.getData(ui.page, ""), ui.page);
 	}
@@ -45,10 +39,8 @@ public class UI_Function {
 		float qty=Input.inputFloat("Stock quantity:");
 		System.out.print("Content: ");
 		String content=Input.inputContent();
-		//Date date=Input.inputDate("Input date:");
 		SimpleDateFormat sdf=new SimpleDateFormat("yyyy/MM/dd");
 		String date=sdf.format(new Date());
-		//System.out.println(sdf.format(new java.util.Date()));
 		if(!ui.proDao.insertData(new Product(0,name,unit,qty,date,content))){
 			System.out.println("Failed to insert data, data may duplicate primary key.");
 			return;
@@ -94,12 +86,12 @@ public class UI_Function {
 	public static void update(UserInterface ui){
 		System.out.println("Update Data");
 		int uId=(int)Input.inputFloat("Product id");
-		int prds=ui.proDao.searchCountProductById(uId);
 		Product pro=new GetById(uId).getProduct();
 		if(pro==null){
 			System.out.println("Cannot find id you entered. Please try again.");
 			return;
 		}
+		@SuppressWarnings("resource")
 		Scanner sc=new Scanner(System.in);
 		String ch="";
 		do{	
@@ -209,7 +201,6 @@ public class UI_Function {
 	public static void next(UserInterface ui){
 		System.out.println("Next Data");
 		ui.page.nextPage();
-		//Viewer.displayProduct(ui.proDao.getDataByPage(ui.page), ui.page);
 		Viewer.displayProduct(ui.igetdata.getData(ui.page, ""), ui.page);
 	}
 	
@@ -217,7 +208,6 @@ public class UI_Function {
 	public static void previous(UserInterface ui){
 		System.out.println("Previous Data");
 		ui.page.previousPage();
-		//Viewer.displayProduct(ui.proDao.getDataByPage(ui.page), ui.page);
 		Viewer.displayProduct(ui.igetdata.getData(ui.page, ""), ui.page);
 	}
 	
@@ -226,7 +216,6 @@ public class UI_Function {
 		System.out.println("First Data");
 		ui.page.firstPage();
 		
-		//Viewer.displayProduct(ui.proDao.getDataByPage(ui.page), ui.page);
 		Viewer.displayProduct(ui.igetdata.getData(ui.page, ""), ui.page);
 	}
 	
@@ -234,7 +223,6 @@ public class UI_Function {
 	public static void last(UserInterface ui){
 		System.out.println("Last Data");
 		ui.page.lastPage();
-		//Viewer.displayProduct(ui.proDao.getDataByPage(ui.page), ui.page);
 		Viewer.displayProduct(ui.igetdata.getData(ui.page, ""), ui.page);
 	}
 	
@@ -248,7 +236,6 @@ public class UI_Function {
 			return;
 		}
 		ui.page.setCurrentPage(page);
-		//Viewer.displayProduct(ui.proDao.getDataByPage(ui.page), ui.page);
 		Viewer.displayProduct(ui.igetdata.getData(ui.page, ""), ui.page);
 	}
 	///----------------------------------------set row in a page---------------------//
@@ -361,12 +348,11 @@ public static void viewScreenShot(UserInterface ui){
 				System.err.println("\nInvalid input! Try again!\n");
 			}
 		}
-		ArrayList<Product> prd=new ArrayList<>();
+		ArrayList<Product> prd = null;
 		try{
 			prd=(ArrayList<Product>) new ProductReport().get(reports.listFiles()[ind-1].getPath());
 		}catch(Exception e){
 			System.out.println("Unknown file type! This file is not a kind of product report.");
-			//return;
 		}
 		if(prd==null){
 			System.out.println("Empty!");
@@ -386,8 +372,8 @@ public static void viewScreenShot(UserInterface ui){
 			System.out.println("--------------------------Student searching data------------------------");
 			System.out.println("1.)Search by id");
 			System.out.println("2.)Search by name");
-			System.out.println("3.)Search by name and content");
-			System.out.println("exit.) back to menu");
+			System.out.println("3.)Search by content");
+			System.out.println("e.) back to menu");
 			choice=Input.inputString("Option >");
 			switch(choice){
 			case "1":
@@ -400,7 +386,6 @@ public static void viewScreenShot(UserInterface ui){
 					System.out.println("Could not find data id:"+id);
 					break;
 				}
-				//Viewer.displayData(Product.getFields(), idFound.toArray());
 				ui.page.calculate(idFound);
 				Viewer.displayProduct(ui.igetdata.getData(ui.page, ""), ui.page);
 				System.out.println("Total found:"+idFound+" products");
@@ -415,11 +400,9 @@ public static void viewScreenShot(UserInterface ui){
 					break;
 				}
 				ui.page.calculate(nameFound);
-				//Viewer.displayData(Product.getFields(), nameFound.toArray());
-				//Viewer.displayProduct(nameFound, ui.page);
 				Viewer.displayProduct(ui.igetdata.getData(ui.page, ""), ui.page);
 				System.out.println("Total found:"+nameFound+"products");
-				choice="exit";
+				choice="e";
 				break;
 			case "3":
 				String rand=Input.inputString("Input search word:");
@@ -431,16 +414,15 @@ public static void viewScreenShot(UserInterface ui){
 					break;
 				}
 				ui.page.calculate(contentFound);
-				//Viewer.displayData(Product.getFields(), randFound.toArray());
-				//Viewer.displayProduct(randFound, ui.page);
+
 				Viewer.displayProduct(ui.igetdata.getData(ui.page, ""), ui.page);
 				System.out.println("Total found:"+contentFound+" products");
-				choice="exit";
+				choice="e";
 				break;
 			default:
 			}
 			
-		}while(!choice.equalsIgnoreCase("exit"));
+		}while(!choice.equalsIgnoreCase("e"));
 	}
 	
 	///--------------------------------------exiting program-----------------------------------///
@@ -458,7 +440,6 @@ public static void viewScreenShot(UserInterface ui){
 		case "W":
 			try{
 				Product p=new Product();
-				//int id=ui.proDao.idGenerated();
 				int id=0;
 				p.setData(id+"-"+arr[1]);
 				System.out.println("Writing data...");
@@ -475,7 +456,6 @@ public static void viewScreenShot(UserInterface ui){
 		case "R":
 			try{
 				int id=Integer.parseInt(arr[1]);
-				//Viewer.displayProduct(ui.proDao.searchProductById(id), ui.page);
 				Viewer.viewProduct(new GetById(id).getProduct());
 			}catch(Exception e){
 				System.out.println("Product id you entered is not available!");
@@ -583,6 +563,7 @@ public static void viewScreenShot(UserInterface ui){
 		System.out.printf("%70s","+==============================================================================================+\n");
 		
 		String gotomenu;
+		@SuppressWarnings("resource")
 		Scanner cin=new Scanner(System.in);
 		System.out.println("Press b to go back main menu\n");
 		System.out.print(">");

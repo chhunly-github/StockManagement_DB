@@ -1,4 +1,4 @@
-package DAO;
+package DAO.Implements;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -6,6 +6,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import DAO.DbConnection;
+import DAO.ProductDAO;
+import DAO.Interfaces.IGetData;
 import Pagination.Pagination;
 import Product.Product;
 

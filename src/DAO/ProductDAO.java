@@ -5,13 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.Random;
-
-import Pagination.Pagination;
 import Product.Product;
 
 public class ProductDAO {
@@ -30,7 +24,7 @@ public class ProductDAO {
 		ArrayList<Product> products=new ArrayList<>();
 		Connection cnn = null;
 		try {
-			cnn=DbConnection.getConnection(this.databaseName());
+			cnn=DbConnection.getConnection(ProductDAO.databaseName());
 			String sql="SELECT id FROM tbproduct ORDER BY id";
 			Statement st=cnn.createStatement();
 			ResultSet rs=st.executeQuery(sql);
@@ -59,10 +53,9 @@ public class ProductDAO {
 	}
 	
 	public int searchCountProductById(int id){
-		ArrayList<Product> products=new ArrayList<>();
 		try {
-			Connection cnn=DbConnection.getConnection(this.databaseName());
-			String sql="SELECT id FROM tbproduct WHERE id=?";
+			Connection cnn=DbConnection.getConnection(ProductDAO.databaseName());
+			String sql="SELECT COUNT(1) FROM tbproduct WHERE id=?";
 			PreparedStatement st=cnn.prepareStatement(sql);
 			st.setInt(1, id);
 			ResultSet rs=st.executeQuery();
@@ -75,25 +68,14 @@ public class ProductDAO {
 		return 0;
 	}
 	public int searchCountProductByName(String sname){
-		//ArrayList<Product> products=new ArrayList<>();
 		try {
-			Connection cnn=DbConnection.getConnection(this.databaseName());
-			String sql="SELECT id FROM tbproduct WHERE name like ? ORDER BY id";
+			Connection cnn=DbConnection.getConnection(ProductDAO.databaseName());
+			String sql="SELECT COUNT(1) FROM tbproduct WHERE name like ?";
 			PreparedStatement st=cnn.prepareStatement(sql);
 			st.setString(1, "%"+sname+"%");
 			ResultSet rs=st.executeQuery();
 			rs.next();
 			int count=rs.getInt(1);
-			/*while(rs.next()){
-				int id=rs.getInt("id");
-				String name=rs.getString("name");
-				Float unitprice=rs.getFloat("unitprice");
-				Float quantity=rs.getFloat("stockqty");
-				String impdate=rs.getString("impdate");
-				String content=rs.getString("content");
-				products.add(new Product(id, name, unitprice, quantity, impdate, content));
-				
-			}*/
 			return count;
 		} catch (ClassNotFoundException | SQLException e) {
 			e.printStackTrace();
@@ -102,8 +84,8 @@ public class ProductDAO {
 	}
 	public int searchCountProductByContent(String search){
 		try {
-			Connection cnn=DbConnection.getConnection(this.databaseName());
-			String sql="SELECT * FROM tbproduct WHERE content like ?;";
+			Connection cnn=DbConnection.getConnection(ProductDAO.databaseName());
+			String sql="SELECT COUNT(1) FROM tbproduct WHERE content like ?;";
 			PreparedStatement st=cnn.prepareStatement(sql);
 			st.setString(1, "%"+search+"%");
 			ResultSet rs=st.executeQuery();
@@ -118,10 +100,9 @@ public class ProductDAO {
 	/*------------------------------------insert data----------------------------*/
 	public boolean insertData(Product prd){
 		try {
-			Connection cnn=DbConnection.getConnection(this.databaseName());
+			Connection cnn=DbConnection.getConnection(ProductDAO.databaseName());
 			String sql="INSERT INTO tbproduct(name,unitprice,stockqty,impdate,content) VALUES(?,?,?,?,?)";
 			PreparedStatement pps=cnn.prepareStatement(sql);
-			//pps.setInt(1, prd.getId());
 			pps.setString(1, prd.getName());
 			pps.setFloat(2, prd.getUnitPrice());
 			pps.setFloat(3, prd.getStockQty());
@@ -162,16 +143,13 @@ public class ProductDAO {
 		
 		};
 		int i=0;
-		/*int month=1;
-		int day=1;*/
 		while(i<sql.length){
 			try {
-				Connection cnn=DbConnection.getConnection(this.databaseName());
+				Connection cnn=DbConnection.getConnection(ProductDAO.databaseName());
 				PreparedStatement pps=cnn.prepareStatement(sql[i]);
 				pps.setFloat(1, i*5);
 				pps.setFloat(2, i*8);
-				Random rand=new Random();
-				pps.setString(3, 2016+"/"+/*(int)12*rand.nextFloat()*/2+/*(int)12*rand.nextFloat()*/2);
+				pps.setString(3, 2016+"/"+2+"/"+2);
 				pps.setString(4, "content"+i);
 				pps.executeUpdate();
 				i++;
@@ -192,7 +170,7 @@ public class ProductDAO {
 	/*--------------------------------------update data-----------------------*/
 	public boolean updateData(Product prd){
 		try {
-			Connection cnn=DbConnection.getConnection(this.databaseName());
+			Connection cnn=DbConnection.getConnection(ProductDAO.databaseName());
 			String sql="UPDATE tbproduct SET name=?,unitprice=?,stockqty=?,content=? WHERE id=?;";
 			PreparedStatement pps=cnn.prepareStatement(sql);
 			
@@ -216,7 +194,7 @@ public class ProductDAO {
 	/*--------------------------------------delete data-------------------------------*/
 	public boolean deleteDataById(int id){
 		try {
-			Connection cnn=DbConnection.getConnection(this.databaseName());
+			Connection cnn=DbConnection.getConnection(ProductDAO.databaseName());
 			String sql="DELETE FROM tbproduct WHERE id=?";
 			PreparedStatement pps=cnn.prepareStatement(sql);
 			pps.setInt(1, id);
@@ -233,7 +211,7 @@ public class ProductDAO {
 	
 	public boolean deleteDataByName(String name){
 		try {
-			Connection cnn=DbConnection.getConnection(this.databaseName());
+			Connection cnn=DbConnection.getConnection(ProductDAO.databaseName());
 			String sql="DELETE FROM tbproduct WHERE name=?";
 			PreparedStatement pps=cnn.prepareStatement(sql);
 			pps.setString(1, name);
@@ -249,8 +227,8 @@ public class ProductDAO {
 	}
 	public boolean deleteAll(){
 		try {
-			Connection cnn=DbConnection.getConnection(this.databaseName());
-			String sql="DELETE FROM "+this.tableName()+";";
+			Connection cnn=DbConnection.getConnection(ProductDAO.databaseName());
+			String sql="DELETE FROM "+ProductDAO.tableName()+";";
 			PreparedStatement pps=cnn.prepareStatement(sql);
 			pps.executeUpdate();
 			cnn.close();
@@ -266,7 +244,7 @@ public class ProductDAO {
 	/*------------------------------------get all amount of product-------------------*/
 	public int numberOfProduct(){
 		try{
-			Connection cnn=DbConnection.getConnection(this.databaseName());
+			Connection cnn=DbConnection.getConnection(ProductDAO.databaseName());
 			String getCount="SELECT COUNT(1) FROM tbproduct;";
 			Statement stm=cnn.createStatement();
 			ResultSet rs=stm.executeQuery(getCount);

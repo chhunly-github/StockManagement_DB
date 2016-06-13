@@ -1,21 +1,14 @@
 package UI_Main;
 
-import java.awt.Desktop;
-import java.io.File;
-import java.io.IOException;
-import java.util.ArrayList;
-
 import DAO.DbConnection;
-import DAO.GetAllByPage;
-import DAO.IGetData;
 import DAO.ProductDAO;
+import DAO.Implements.GetAllByPage;
+import DAO.Interfaces.IGetData;
 import Pagination.Pagination;
-import Product.Product;
 
 public class UserInterface {
 	Pagination page;
 	ProductDAO proDao;
-	//boolean isSearch=false;
 	IGetData igetdata;
 /*------------------constructor------------------------*/
 	
@@ -45,8 +38,6 @@ public class UserInterface {
 			System.out.printf("|  G)oto | Se)t row |  Sh)otScreen | V)iew Shots | Re)ports | Exp)ort to report | H)elp | E)xit  |\n");
 			System.out.printf("+================================================================================================+\n");
 			System.out.println();
-			//System.out.print("Option >");
-			//choice="";
 			choice=Input.inputString("Option >");	//cin.nextLine();
 			if(choice.contains("#")){
 				UI_Function.shortcut(choice,this);

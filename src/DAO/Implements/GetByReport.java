@@ -1,7 +1,8 @@
-package DAO;
+package DAO.Implements;
 
 import java.util.ArrayList;
 
+import DAO.Interfaces.IGetData;
 import Pagination.Pagination;
 import Product.Product;
 

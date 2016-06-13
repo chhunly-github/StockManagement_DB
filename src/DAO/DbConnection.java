@@ -2,15 +2,12 @@ package DAO;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Properties;
 
 public class DbConnection {
 	private static Connection connect=null;
-	/*Properties pro =new Properties();
-	*/
+
 	public static Connection getConnection(String databaseName)throws ClassNotFoundException, SQLException{
 
 			Class.forName("org.postgresql.Driver");
@@ -66,7 +63,6 @@ public class DbConnection {
 			Connection cnn=DbConnection.getConnection(dbname);
 			String sql="CREATE TABLE "+tbname+"(id serial PRIMARY KEY , name VARCHAR(30), unitprice FLOAT, stockqty FLOAT, impdate VARCHAR(15), content VARCHAR(200));";
 			Statement st=cnn.createStatement();
-			//ps.setString(1, dbname);
 			st.executeUpdate(sql);
 			return true;
 		}catch(SQLException e){
@@ -85,12 +81,11 @@ public class DbConnection {
 			Connection cnn=DbConnection.getConnection("");
 			String sql="CREATE DATABASE "+dbname+";";
 			Statement st=cnn.createStatement();
-			//ps.setString(1, dbname);
 			st.executeUpdate(sql);
 			return true;
 		}catch(SQLException e){
 			//e.printStackTrace();
-			System.err.println("Can't connect to database!");
+			//System.err.println("Can't connect to database!");
 			
 		} catch (ClassNotFoundException e) {
 			//e.printStackTrace();
