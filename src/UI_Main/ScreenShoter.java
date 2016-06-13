@@ -23,13 +23,5 @@ public class ScreenShoter
         return (formatter.format(now.getTime()));
     }
     
-   /* public static void main(String[] args) throws Exception
-    {
-    	ScreenShoter s2i = new ScreenShoter();
-        try{
-        	s2i.robo();
-        }catch(Exception e){
-        	e.printStackTrace();
-        }
-    }*/
+
 }

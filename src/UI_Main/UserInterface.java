@@ -45,6 +45,7 @@ public class UserInterface {
 			}
 			switch (choice.toUpperCase()) {
 				case "*":/*------------------------------display all data---------------------*/
+					new ClearScreen();
 					page.calculate(proDao.numberOfProduct());
 					igetdata=new GetAllByPage();
 					UI_Function.display(this);
@@ -62,15 +63,19 @@ public class UserInterface {
 					UI_Function.delete(this);
 					break;
 				case "F":/*------------------------------go to first page---------------------*/
+					new ClearScreen();
 					UI_Function.first(this);
 					break;
 				case "P":/*------------------------------go to previous page---------------------*/
+					new ClearScreen();
 					UI_Function.previous(this);
 					break;
 				case "N":/*------------------------------go to next page---------------------*/
+					new ClearScreen();
 					UI_Function.next(this);
 					break;
 				case "L":/*------------------------------go to last page---------------------*/
+					new ClearScreen();
 					UI_Function.last(this);
 					break;
 				case "S":/*------------------------------search product---------------------*/
@@ -78,9 +83,11 @@ public class UserInterface {
 					UI_Function.Search(this);
 					break;
 				case "G":/*------------------------------go to a specific page---------------------*/
+					new ClearScreen();
 					UI_Function.gotoPage(this);
 					break;
 				case "SE":/*------------------------------set number of rows in a page---------------------*/
+					new ClearScreen();
 					UI_Function.setRow(this);
 					break;
 /*				case "SA":------------------------------save any changed to using file---------------------
@@ -95,6 +102,7 @@ public class UserInterface {
 					UI_Function.viewScreenShot(this);
 					break;
 				case "RE":/*------------------------------restore data from a backup file to using file---------------------*/
+					
 					System.out.println("report");
 					UI_Function.getReport(this);
 					break;
@@ -104,6 +112,7 @@ public class UserInterface {
 					break;
 				
 				case "H":/*------------------------------information on using shortcut key---------------------*/
+					new ClearScreen();
 					UI_Function.showHelp();
 					break;
 				case "E":/*------------------------------exit the program---------------------*/

@@ -22,15 +22,6 @@ public class ProductReport implements IReport{
 		if(obj==null){
 			return false;
 		}
-		/*ArrayList<Product> prds;
-		try{
-			prds=(ArrayList<Product>) obj;
-		}catch(Exception e){
-			return false;
-		}
-		for(Product p:prds){
-			System.out.println(p.toString());
-		}*/
 		ObjectOutputStream oos=null;
 		try{
 			this.reportName=setName();

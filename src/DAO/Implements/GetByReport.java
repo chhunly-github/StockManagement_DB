@@ -14,8 +14,6 @@ public class GetByReport implements IGetData{
 	@Override
 	public ArrayList<Product> getData(Pagination page, String arg) {
 		ArrayList<Product> prd=new ArrayList<>();
-		System.out.println("offset="+page.offSet());
-		System.out.println("last="+page.getLastData());
 		if(this.prdReport==null){
 			return new ArrayList<>();
 		}

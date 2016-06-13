@@ -358,6 +358,7 @@ public static void viewScreenShot(UserInterface ui){
 			System.out.println("Empty!");
 			return;
 		}
+		new ClearScreen();
 		ui.igetdata=new GetByReport(prd);
 		ui.page.calculate(prd.size());
 		Viewer.displayProduct(ui.igetdata.getData(ui.page, ""), ui.page);
